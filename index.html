@@ -564,7 +564,9 @@ input[type="range"] { width: 100%; accent-color: #c084fc; }
   #lab-controls .slider-row,
   #lab-controls .field,
   #lab-controls .switch,
-  #lab-controls .seg { grid-column: 1 / -1; }
+  #lab-controls .seg,
+  #lab-controls .tiny,
+  #lab-controls .mode-btn { grid-column: 1 / -1; }
   .lab-grid > .lab-col:last-child { order: 3; }
   .jgrid { grid-template-columns: 1fr 1fr; }
   .filters { grid-template-columns: 1fr 1fr; }
@@ -1664,7 +1666,15 @@ input[type="range"] { width: 100%; accent-color: #c084fc; }
     { id: "atom", no: "02", title: "อะตอมและสมบัติของธาตุ", en: "Atomic Structure", minutes: 12, blurb: "แบบจำลองอะตอม การจัดเรียงอิเล็กตรอน สเปกตรัม และแนวโน้มในตารางธาตุ" },
     { id: "bond", no: "03", title: "พันธะเคมี", en: "Chemical Bonding", minutes: 12, blurb: "พันธะไอออนิก โคเวเลนต์ โลหะ รูปร่าง VSEPR สภาพขั้ว และแรงระหว่างโมเลกุล" },
     { id: "mole", no: "04", title: "โมลและสูตรเคมี", en: "Moles and Formulas", minutes: 10, blurb: "มวลอะตอมเฉลี่ย วงแปลงหน่วยโมล ร้อยละโดยมวล และสูตรเอมพิริกัล" },
-    { id: "solution", no: "05", title: "สารละลาย", en: "Solutions", minutes: 12, blurb: "หน่วยความเข้มข้น การเจือจาง กราฟสภาพละลายได้ และสมบัติคอลลิเกทีฟ" }
+    { id: "solution", no: "05", title: "สารละลาย", en: "Solutions", minutes: 12, blurb: "หน่วยความเข้มข้น การเจือจาง กราฟสภาพละลายได้ และสมบัติคอลลิเกทีฟ" },
+    { id: "stoich", no: "06", title: "ปริมาณสารสัมพันธ์", en: "Stoichiometry", minutes: 14, blurb: "ดุลสมการ อัตราส่วนโมล สารกำหนดปริมาณ และผลได้ร้อยละ" },
+    { id: "gas", no: "07", title: "แก๊สและสมบัติของแก๊ส", en: "Gases", minutes: 14, blurb: "กฎของแก๊ส PV = nRT ความดันย่อย การแพร่ และแก๊สจริง" },
+    { id: "rate", no: "08", title: "อัตราการเกิดปฏิกิริยาเคมี", en: "Reaction Rates", minutes: 14, blurb: "ทฤษฎีการชน ปัจจัยที่มีผล แผนภาพพลังงาน และกฎอัตรา" },
+    { id: "equil", no: "09", title: "สมดุลเคมี", en: "Chemical Equilibrium", minutes: 14, blurb: "สมดุลไดนามิก Q กับ K และหลักของเลอชาเตอลิเอ" },
+    { id: "acid", no: "10", title: "กรด-เบส", en: "Acids and Bases", minutes: 14, blurb: "pH การไทเทรต สารละลายบัฟเฟอร์ และอินดิเคเตอร์" },
+    { id: "electro", no: "11", title: "เคมีไฟฟ้า", en: "Electrochemistry", minutes: 14, blurb: "เซลล์กัลวานิก อิเล็กโทรลิซิส สมการเนิร์นสต์ และการกัดกร่อน" },
+    { id: "organic", no: "12", title: "เคมีอินทรีย์", en: "Organic Chemistry", minutes: 14, blurb: "หมู่ฟังก์ชัน ไอโซเมอร์ ปฏิกิริยาอินทรีย์ และมอนอเมอร์" },
+    { id: "polymer", no: "13", title: "พอลิเมอร์", en: "Polymers", minutes: 12, blurb: "พอลิเมอไรเซชัน โครงสร้างสายโซ่ ยาง และรหัสรีไซเคิล" }
   ];
 
   const IE_ANOMALIES = [4, 5, 7, 8, 12, 13, 15, 16];
@@ -1810,7 +1820,67 @@ input[type="range"] { width: 100%; accent-color: #c084fc; }
       [fv("X", "X เศษส่วนโมล", ""), fv("ns", "n ตัวละลาย", "mol"), fv("nv", "n ตัวทำละลาย", "mol")],
       { X: ["ns/(ns+nv)", "ns / (ns + nv)"], ns: ["X*nv/(1-X)", "X × nv / (1 − X)"] },
       ["ตัวหารคือโมลรวม ไม่ใช่โมลตัวทำละลายอย่างเดียว", "เศษส่วนโมลไม่มีหน่วย และรวมทุกองค์ประกอบได้ 1", "X = ns / (ns + nv)"],
-      "เศษส่วนโมลไม่ใช่ร้อยละโดยมวล")
+      "เศษส่วนโมลไม่ใช่ร้อยละโดยมวล"),
+    F("stoich-mass", "ปริมาณสารสัมพันธ์", "มวลผลิตภัณฑ์จากมวลสารตั้งต้น",
+      "m<sub>B</sub> = m<sub>A</sub> / M<sub>A</sub> × (b/a) × M<sub>B</sub>",
+      [fv("mB", "m ผลิตภัณฑ์", "g"), fv("mA", "m สารตั้งต้น", "g"), fv("MA", "M สารตั้งต้น", "g/mol"), fv("a", "สัมประสิทธิ์ a", ""), fv("b", "สัมประสิทธิ์ b", ""), fv("MB", "M ผลิตภัณฑ์", "g/mol")],
+      { mB: ["mA/MA*(b/a)*MB", "mA / MA × (b/a) × MB"], mA: ["mB*MA*a/(b*MB)", "mB × MA × a / (b × MB)"] },
+      ["แปลงเป็นโมลก่อน แล้วคูณอัตราส่วนจากสมการที่ดุลแล้ว", "b/a คือโมลผลิตภัณฑ์ต่อโมลสารตั้งต้น", "mB = mA / MA × (b/a) × MB"],
+      "สารที่มวลกรัมน้อยกว่าไม่ใช่สารกำหนดปริมาณเสมอ"),
+    F("yield", "ปริมาณสารสัมพันธ์", "ผลได้ร้อยละ",
+      "% yield = ผลได้จริง / ผลได้ตามทฤษฎี × 100",
+      [fv("pct", "% ผลได้", "%"), fv("act", "ผลได้จริง", "g"), fv("theo", "ผลได้ตามทฤษฎี", "g")],
+      { pct: ["act/theo*100", "act / theo × 100"], act: ["pct*theo/100", "pct × theo / 100"] },
+      ["ตัวหารคือผลได้ตามทฤษฎีจากสารกำหนดปริมาณ", "คูณ 100 เพื่อเป็นร้อยละ", "pct = act / theo × 100"],
+      "ผลได้จริงในการทดลองปกติไม่ควรเกินผลได้ตามทฤษฎี"),
+    F("igp", "แก๊ส", "ความดันจาก PV = nRT",
+      "P = nRT / V โดย R = 0.0821 L·atm/(mol·K)",
+      [fv("P", "P ความดัน", "atm"), fv("n", "n", "mol"), fv("T", "T", "K"), fv("V", "V", "L")],
+      { P: ["n*0.0821*T/V", "n × 0.0821 × T / V"], V: ["n*0.0821*T/P", "n × 0.0821 × T / P"], n: ["P*V/(0.0821*T)", "P × V / (0.0821 × T)"], T: ["P*V/(n*0.0821)", "P × V / (n × 0.0821)"] },
+      ["อุณหภูมิต้องเป็นเคลวิน", "R ชุดนี้ให้ความดันหน่วย atm และปริมาตรหน่วยลิตร", "P = n × 0.0821 × T / V"],
+      "ห้ามแทนอุณหภูมิเป็นเซลเซียสในกฎของแก๊ส"),
+    F("graham", "แก๊ส", "กฎการแพร่ของเกรแฮม",
+      "r<sub>1</sub>/r<sub>2</sub> = √(M<sub>2</sub>/M<sub>1</sub>)",
+      [fv("ratio", "r1/r2", ""), fv("M1", "M1", "g/mol"), fv("M2", "M2", "g/mol")],
+      { ratio: ["sqrt(M2/M1)", "√(M2 / M1)"] },
+      ["แก๊สที่เบากว่าแพร่ได้เร็วกว่า", "สลับมวลในรากที่สอง", "ratio = sqrt(M2 / M1)"],
+      "อุณหภูมิเดียวกันไม่ได้ทำให้ความเร็วเฉลี่ยของแก๊สทุกชนิดเท่ากัน"),
+    F("rate1", "อัตราการเกิดปฏิกิริยา", "กฎอัตราอันดับหนึ่ง",
+      "r = k × [A]",
+      [fv("r", "r อัตรา", "mol/L·s"), fv("k", "k", "1/s"), fv("A", "[A]", "mol/L")],
+      { r: ["k*A", "k × [A]"], k: ["r/A", "r / [A]"], A: ["r/k", "r / k"] },
+      ["อันดับหนึ่งอัตราแปรผันตรงกับความเข้มข้น", "หน่วยของ k ขึ้นกับอันดับ", "r = k × A"],
+      "ตัวเร่งไม่ได้ทำให้ได้ผลิตภัณฑ์มากกว่าที่สมการกำหนด"),
+    F("kc", "สมดุลเคมี", "ค่าคงที่สมดุลอย่างง่าย",
+      "Kc = [C][D] / ([A][B])",
+      [fv("Kc", "Kc", ""), fv("A", "[A]", "mol/L"), fv("B", "[B]", "mol/L"), fv("C", "[C]", "mol/L"), fv("D", "[D]", "mol/L")],
+      { Kc: ["C*D/(A*B)", "[C] × [D] / ([A] × [B])"], C: ["Kc*A*B/D", "Kc × [A] × [B] / [D]"] },
+      ["ใช้ความเข้มข้น ณ จุดสมดุล", "สารแข็งบริสุทธิ์ไม่ใส่ในนิพจน์", "Kc = C × D / (A × B)"],
+      "มีเพียงอุณหภูมิที่เปลี่ยนค่าคงที่สมดุล K"),
+    F("ph", "กรด-เบส", "pH จากความเข้มข้นไฮโดรเนียม",
+      "pH = −log[H<sub>3</sub>O<sup>+</sup>]",
+      [fv("pH", "pH", ""), fv("H", "[H3O+]", "mol/L")],
+      { pH: ["-log(H)", "−log(H)"], H: ["pow(10,-pH)", "10^(−pH)"] },
+      ["log ในสูตรนี้คือลอการิทึมฐาน 10", "ความเข้มข้นต้องเป็นโมลต่อลิตร", "pH = −log(H)"],
+      "pH 7 เป็นกลางที่ 25 องศาเซลเซียส เมื่อความเข้มข้นของ H3O+ เท่ากับ OH−"),
+    F("buffer", "กรด-เบส", "สมการเฮนเดอร์สัน-ฮัสเซลบัลช์",
+      "pH = pKa + log([A−]/[HA])",
+      [fv("pH", "pH", ""), fv("pKa", "pKa", ""), fv("A", "[A−]", "mol/L"), fv("HA", "[HA]", "mol/L")],
+      { pH: ["pKa+log(A/HA)", "pKa + log(A / HA)"] },
+      ["A คือคู่เบส และ HA คือคู่กรด", "ใช้เมื่อเป็นสารละลายบัฟเฟอร์", "pH = pKa + log(A / HA)"],
+      "บัฟเฟอร์ต้านการเปลี่ยน pH ได้ดีเมื่อเติมกรดหรือเบสเพียงเล็กน้อย"),
+    F("ecell", "เคมีไฟฟ้า", "ศักย์ไฟฟ้ามาตรฐานของเซลล์",
+      "E°cell = E°cathode − E°anode",
+      [fv("E", "E°cell", "V"), fv("Ec", "E° แคโทด", "V"), fv("Ea", "E° แอโนด", "V")],
+      { E: ["Ec-Ea", "Ec − Ea"], Ec: ["E+Ea", "E + Ea"], Ea: ["Ec-E", "Ec − E"] },
+      ["แคโทดคือครึ่งเซลล์ที่ E° สูงกว่า", "แอโนดคือฝ่ายที่เกิดออกซิเดชัน", "E = Ec − Ea"],
+      "แอโนดไม่ได้เป็นขั้วลบในทุกชนิดของเซลล์"),
+    F("faraday", "เคมีไฟฟ้า", "มวลจากกฎของฟาราเดย์",
+      "m = I × t × M / (n × 96485)",
+      [fv("m", "m มวล", "g"), fv("I", "I กระแส", "A"), fv("t", "t เวลา", "s"), fv("M", "M มวลโมล", "g/mol"), fv("n", "n โมลอิเล็กตรอน", "mol")],
+      { m: ["I*t*M/(n*96485)", "I × t × M / (n × 96485)"], t: ["m*n*96485/(I*M)", "m × n × 96485 / (I × M)"] },
+      ["96485 คือคูลอมบ์ต่อโมลอิเล็กตรอน", "n คือจำนวนอิเล็กตรอนในครึ่งปฏิกิริยา", "m = I × t × M / (n × 96485)"],
+      "อิเล็กตรอนไหลในสายไฟ ส่วนในสารละลายเป็นไอออนที่เคลื่อนที่")
   ];
 
   const api = {
@@ -3906,6 +3976,1230 @@ input[type="range"] { width: 100%; accent-color: #c084fc; }
   window.SolutionLab = spec;
 })();
 
+/* ห้องแล็บเพิ่ม: ปริมาณสารสัมพันธ์ แก๊ส อัตรา สมดุล กรด-เบส ไฟฟ้า อินทรีย์ พอลิเมอร์ */
+(function () {
+  const L = () => window.LabCore;
+  function metric(v, s) { return '<div class="metric"><b>' + v + '</b><span>' + s + '</span></div>'; }
+  function fmt(x, d) {
+    if (!isFinite(x)) return "—";
+    const a = Math.abs(x);
+    const digits = d == null ? 2 : d;
+    if (a !== 0 && (a >= 1e5 || a < 0.001)) return x.toExponential(2);
+    const p = Math.pow(10, digits);
+    return (Math.round((x + Math.sign(x) * 1e-10) * p) / p).toFixed(digits);
+  }
+  function bg(ctx, w, h) {
+    const g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, "#2a1248");
+    g.addColorStop(1, "#120816");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+  }
+  function bindNum(root, state, rows) {
+    rows.forEach(function (row) {
+      const el = root.querySelector("#" + row[0]);
+      const lb = root.querySelector("#lb-" + row[0]);
+      if (!el) return;
+      el.oninput = function () {
+        state[row[1]] = Number(el.value);
+        if (lb) lb.textContent = state[row[1]].toFixed(row[2]);
+      };
+    });
+  }
+  function bindSel(root, state, pairs) {
+    pairs.forEach(function (p) {
+      const el = root.querySelector("#" + p[0]);
+      if (!el) return;
+      el.onchange = function () {
+        state[p[1]] = p[2] ? Number(el.value) : el.value;
+        if (p[3]) p[3](state);
+      };
+    });
+  }
+  function bindTog(root, state, ids) {
+    ids.forEach(function (id) {
+      const el = root.querySelector("#" + id);
+      if (el) el.onchange = function () { state[id] = el.checked; };
+    });
+  }
+  function dot(ctx, x, y, r, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  function barsOf(ctx, w, h, values, labels, colors) {
+    ctx.clearRect(0, 0, w, h);
+    L().bars(ctx, { x: 16, y: 16, w: w - 32, h: h - 46 }, values, labels, colors);
+  }
+
+  const RX = [
+    { name: "สังเคราะห์แอมโมเนีย", eq: "N₂ + 3H₂ → 2NH₃",
+      left: [{ f: "N₂", c: 1, mw: 28.014, at: { N: 2 } }, { f: "H₂", c: 3, mw: 2.016, at: { H: 2 } }],
+      right: [{ f: "NH₃", c: 2, mw: 17.031, at: { N: 1, H: 3 } }],
+      use: "กระบวนการฮาเบอร์ผลิตแอมโมเนียสำหรับปุ๋ย" },
+    { name: "เผาไหม้มีเทน", eq: "CH₄ + 2O₂ → CO₂ + 2H₂O",
+      left: [{ f: "CH₄", c: 1, mw: 16.043, at: { C: 1, H: 4 } }, { f: "O₂", c: 2, mw: 31.998, at: { O: 2 } }],
+      right: [{ f: "CO₂", c: 1, mw: 44.009, at: { C: 1, O: 2 } }, { f: "H₂O", c: 2, mw: 18.015, at: { H: 2, O: 1 } }],
+      use: "คำนวณเชื้อเพลิงและแก๊สเรือนกระจก" },
+    { name: "ตะกอนซิลเวอร์คลอไรด์", eq: "AgNO₃ + NaCl → AgCl + NaNO₃",
+      left: [{ f: "AgNO₃", c: 1, mw: 169.874, at: { Ag: 1, N: 1, O: 3 } }, { f: "NaCl", c: 1, mw: 58.44, at: { Na: 1, Cl: 1 } }],
+      right: [{ f: "AgCl", c: 1, mw: 143.32, at: { Ag: 1, Cl: 1 } }, { f: "NaNO₃", c: 1, mw: 84.994, at: { Na: 1, N: 1, O: 3 } }],
+      use: "การตกตะกอนในห้องแล็บวิเคราะห์" },
+    { name: "สะเทินกรด-เบส", eq: "HCl + NaOH → NaCl + H₂O",
+      left: [{ f: "HCl", c: 1, mw: 36.458, at: { H: 1, Cl: 1 } }, { f: "NaOH", c: 1, mw: 39.997, at: { Na: 1, O: 1, H: 1 } }],
+      right: [{ f: "NaCl", c: 1, mw: 58.44, at: { Na: 1, Cl: 1 } }, { f: "H₂O", c: 1, mw: 18.015, at: { H: 2, O: 1 } }],
+      use: "การไทเทรตและปรับ pH" },
+    { name: "แมกนีเซียมกับกรด", eq: "Mg + 2HCl → MgCl₂ + H₂",
+      left: [{ f: "Mg", c: 1, mw: 24.305, at: { Mg: 1 } }, { f: "HCl", c: 2, mw: 36.458, at: { H: 1, Cl: 1 } }],
+      right: [{ f: "MgCl₂", c: 1, mw: 95.205, at: { Mg: 1, Cl: 2 } }, { f: "H₂", c: 1, mw: 2.016, at: { H: 2 } }],
+      use: "เตรียมแก๊สไฮโดรเจนในห้องแล็บ" }
+  ];
+  function stoichRx(s) { return RX[s.rx] || RX[0]; }
+  function stoichMoles(sp, input, s) {
+    if (s.unit === "mol") return input;
+    if (s.unit === "L") return input / (s.stp ? 22.4 : 24.5);
+    if (s.unit === "M") return s.conc * input / 1000;
+    return input / sp.mw;
+  }
+  function stoichCalc(s) {
+    const rx = stoichRx(s);
+    const n = [stoichMoles(rx.left[0], s.in1, s), stoichMoles(rx.left[1], s.in2, s)];
+    const ratio = n.map(function (v, i) { return v / rx.left[i].c; });
+    const lim = ratio[0] <= ratio[1] ? 0 : 1;
+    const ex = 1 - lim;
+    const extent = Math.max(0, Math.min(ratio[0], ratio[1]));
+    const prod = rx.right.map(function (p) { return { f: p.f, n: extent * p.c, m: extent * p.c * p.mw }; });
+    const usedEx = extent * rx.left[ex].c;
+    const leftN = Math.max(0, n[ex] - usedEx);
+    const theo = prod[0].m;
+    const actual = theo * s.yieldPct / 100;
+    const massIn = n[0] * rx.left[0].mw + n[1] * rx.left[1].mw;
+    const massOut = prod.reduce(function (a, p) { return a + p.m; }, 0) + leftN * rx.left[ex].mw;
+    return { n: n, ratio: ratio, lim: lim, ex: ex, extent: extent, prod: prod, leftN: leftN, leftM: leftN * rx.left[ex].mw, theo: theo, actual: actual, pct: theo > 0 ? actual / theo * 100 : 0, massIn: massIn, massOut: massOut };
+  }
+  function atomTally(list, coeffs) {
+    const t = {};
+    list.forEach(function (sp, i) {
+      Object.keys(sp.at).forEach(function (el) { t[el] = (t[el] || 0) + sp.at[el] * coeffs[i]; });
+    });
+    return t;
+  }
+  window.StoichLab = {
+    meta: { title: "ปริมาณสารสัมพันธ์", en: "Stoichiometry" },
+    modes: ["ดุลสมการและกฎทรงมวล", "สะพานโมล", "สารกำหนดปริมาณ", "ผลได้ร้อยละ"],
+    createState: function () {
+      return { mode: 0, playing: true, time: 0, hits: [], rx: 0, unit: "g", stp: true, conc: 0.5, in1: 28, in2: 6, yieldPct: 80, micro: true, flow: true, coeff: [1, 1, 1, 1] };
+    },
+    controls: function (s) {
+      const Lc = L();
+      const rx = stoichRx(s);
+      let html = Lc.selectBox("rx", "ปฏิกิริยา", String(s.rx), RX.map(function (r, i) { return { id: String(i), name: r.name }; }));
+      if (s.mode === 0) {
+        html += '<p class="tiny">ปรับสัมประสิทธิ์ให้จำนวนอะตอมสองฝั่งเท่ากัน</p>';
+        rx.left.concat(rx.right).forEach(function (sp, i) {
+          html += '<div class="playrow"><button type="button" data-coeff="' + i + '" data-d="-1">−</button><span>' + sp.f + " " + (s.coeff[i] || 0) + '</span><button type="button" data-coeff="' + i + '" data-d="1">+</button></div>';
+        });
+      } else {
+        html += '<div class="seg"><button type="button" class="' + (s.unit === "g" ? "on" : "") + '" data-unit="g">กรัม</button><button type="button" class="' + (s.unit === "mol" ? "on" : "") + '" data-unit="mol">โมล</button><button type="button" class="' + (s.unit === "L" ? "on" : "") + '" data-unit="L">ลิตรแก๊ส</button><button type="button" class="' + (s.unit === "M" ? "on" : "") + '" data-unit="M">สารละลาย</button></div>';
+        const u = s.unit === "g" ? "g" : s.unit === "mol" ? "mol" : s.unit === "L" ? "L" : "mL";
+        html += Lc.slider("in1", rx.left[0].f + " (" + u + ")", 0, s.unit === "mol" ? 10 : s.unit === "M" ? 1000 : 200, s.unit === "mol" ? 0.01 : 0.1, s.in1, 2);
+        html += Lc.slider("in2", rx.left[1].f + " (" + u + ")", 0, s.unit === "mol" ? 10 : s.unit === "M" ? 1000 : 200, s.unit === "mol" ? 0.01 : 0.1, s.in2, 2);
+        if (s.unit === "L") html += Lc.toggle("stp", "สภาวะ STP (22.4 L/mol) ถ้าปิดใช้ RTP 24.5", s.stp);
+        if (s.unit === "M") html += Lc.slider("conc", "ความเข้มข้น (mol/L)", 0.1, 5, 0.1, s.conc, 1);
+        if (s.mode === 3) html += Lc.slider("yieldPct", "ประสิทธิภาพการทดลอง (%)", 0, 100, 1, s.yieldPct, 0);
+        html += Lc.toggle("micro", "แสดงอนุภาค", s.micro) + Lc.toggle("flow", "แสดงขั้นตอนคำนวณ", s.flow);
+      }
+      return html;
+    },
+    bind: function (root, s, api) {
+      bindSel(root, s, [["rx", "rx", true, function (st) { st.coeff = [1, 1, 1, 1]; }]]);
+      bindNum(root, s, [["in1", "in1", 2], ["in2", "in2", 2], ["conc", "conc", 1], ["yieldPct", "yieldPct", 0]]);
+      bindTog(root, s, ["stp", "micro", "flow"]);
+      root.querySelectorAll("[data-unit]").forEach(function (btn) {
+        btn.onclick = function () {
+          s.unit = btn.dataset.unit;
+          const max = s.unit === "mol" ? 10 : 200;
+          s.in1 = Math.min(max, Math.max(0, s.in1));
+          s.in2 = Math.min(max, Math.max(0, s.in2));
+          api.rerender();
+        };
+      });
+      root.querySelectorAll("[data-coeff]").forEach(function (btn) {
+        btn.onclick = function () {
+          const i = Number(btn.dataset.coeff);
+          s.coeff[i] = Math.max(0, Math.min(8, (s.coeff[i] || 0) + Number(btn.dataset.d)));
+          api.rerender();
+        };
+      });
+    },
+    draw: function (ctx, w, h, s) {
+      bg(ctx, w, h);
+      const rx = stoichRx(s);
+      const T = L().text;
+      if (s.mode === 0) {
+        const lc = s.coeff.slice(0, rx.left.length);
+        const rc = s.coeff.slice(rx.left.length, rx.left.length + rx.right.length);
+        const LT = atomTally(rx.left, lc);
+        const RT = atomTally(rx.right, rc);
+        const lm = rx.left.reduce(function (a, sp, i) { return a + lc[i] * sp.mw; }, 0);
+        const rm = rx.right.reduce(function (a, sp, i) { return a + rc[i] * sp.mw; }, 0);
+        const tilt = Math.max(-18, Math.min(18, (lm - rm) * 0.4));
+        ctx.save();
+        ctx.translate(w / 2, h * 0.62);
+        ctx.rotate(tilt * Math.PI / 180);
+        ctx.strokeStyle = "#e9d5ff";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-w * 0.32, 0);
+        ctx.lineTo(w * 0.32, 0);
+        ctx.stroke();
+        ctx.fillStyle = "#c084fc";
+        ctx.fillRect(-8, 0, 16, 46);
+        T(ctx, "สารตั้งต้น " + fmt(lm, 1) + " g", -w * 0.28, -16, { color: "#f5e9ff" });
+        T(ctx, "ผลิตภัณฑ์ " + fmt(rm, 1) + " g", w * 0.05, -16, { color: "#f5e9ff" });
+        ctx.restore();
+        const keys = Object.keys(LT).concat(Object.keys(RT)).filter(function (k, i, a) { return a.indexOf(k) === i; });
+        const ok = keys.every(function (k) { return (LT[k] || 0) === (RT[k] || 0); }) && lm > 0;
+        T(ctx, ok ? "ดุลแล้ว มวลสองฝั่งเท่ากัน" : "ยังไม่ดุล ปรับเลขหน้าสาร", 24, 36, { color: ok ? "#3ee0a0" : "#f5c15d", font: "16px Segoe UI, Leelawadee UI" });
+        T(ctx, rx.eq, 24, 62, { color: "#e9d5ff" });
+        return;
+      }
+      const info = stoichCalc(s);
+      L().drawBeaker(ctx, w * 0.12, 40, 120, h * 0.55, 0.55, "rgba(192,132,252,0.45)");
+      L().drawBeaker(ctx, w * 0.62, 40, 120, h * 0.55, 0.4, "rgba(232,121,249,0.4)");
+      T(ctx, "ก่อนปฏิกิริยา", w * 0.12, 32, { color: "#e9d5ff" });
+      T(ctx, "หลังปฏิกิริยา", w * 0.62, 32, { color: "#e9d5ff" });
+      if (s.micro) {
+        const nshow = Math.min(18, Math.round(info.n[0] * 4 + 2));
+        for (let i = 0; i < nshow; i++) dot(ctx, w * 0.16 + (i % 5) * 16, h * 0.45 + Math.floor(i / 5) * 16, 5, i < info.extent * 4 ? "#f0abfc" : "#ddd6fe");
+        info.prod.forEach(function (p, pi) {
+          const c = Math.min(12, Math.round(p.n * 3 + 1));
+          for (let i = 0; i < c; i++) dot(ctx, w * 0.66 + (i % 4) * 18 + pi * 8, h * 0.42 + Math.floor(i / 4) * 16, 5, pi ? "#86efac" : "#f9a8d4");
+        });
+      }
+      T(ctx, "สารกำหนดปริมาณ: " + rx.left[info.lim].f, 24, h - 28, { color: "#fde68a", font: "15px Segoe UI, Leelawadee UI" });
+    },
+    chart: function (ctx, w, h, s) {
+      const rx = stoichRx(s);
+      if (s.mode === 0) {
+        const keys = [];
+        rx.left.concat(rx.right).forEach(function (sp) { Object.keys(sp.at).forEach(function (k) { if (keys.indexOf(k) < 0) keys.push(k); }); });
+        const LT = atomTally(rx.left, s.coeff.slice(0, rx.left.length));
+        const RT = atomTally(rx.right, s.coeff.slice(rx.left.length));
+        const vals = [];
+        const labels = [];
+        keys.forEach(function (k) { vals.push(LT[k] || 0, RT[k] || 0); labels.push(k + "ซ้าย", k + "ขวา"); });
+        barsOf(ctx, w, h, vals, labels, ["#c084fc", "#86efac"]);
+        return;
+      }
+      const info = stoichCalc(s);
+      if (s.mode === 1) barsOf(ctx, w, h, [info.n[0], info.prod[0].n], ["โมลตั้งต้น", "โมลผลิตภัณฑ์"], ["#c084fc", "#f0abfc"]);
+      else if (s.mode === 2) barsOf(ctx, w, h, [info.n[info.lim] * rx.left[info.lim].mw, info.leftM, info.theo], ["ใช้ไป", "เหลือ", "ผลิตภัณฑ์"], ["#f59e0b", "#94a3b8", "#3ee0a0"]);
+      else barsOf(ctx, w, h, [info.theo, info.actual], ["ตามทฤษฎี", "ได้จริง"], ["#c084fc", "#f0abfc"]);
+    },
+    readout: function (s) {
+      if (s.mode === 0) {
+        const rx = stoichRx(s);
+        const lm = rx.left.reduce(function (a, sp, i) { return a + (s.coeff[i] || 0) * sp.mw; }, 0);
+        const rm = rx.right.reduce(function (a, sp, i) { return a + (s.coeff[rx.left.length + i] || 0) * sp.mw; }, 0);
+        return metric(fmt(lm, 2), "มวลซ้าย g") + metric(fmt(rm, 2), "มวลขวา g") + metric(Math.abs(lm - rm) < 0.05 ? "ดุล" : "ไม่ดุล", "สถานะ");
+      }
+      const info = stoichCalc(s);
+      const rx = stoichRx(s);
+      if (s.mode === 3) return metric(fmt(info.theo, 2), "ทฤษฎี g") + metric(fmt(info.actual, 2), "จริง g") + metric(fmt(info.pct, 1), "% yield");
+      return metric(rx.left[info.lim].f, "จำกัดปริมาณ") + metric(fmt(info.theo, 2), "ผลิตภัณฑ์ g") + metric(fmt(info.leftM, 2), "สารเหลือ g");
+    },
+    equation: function (s) {
+      const rx = stoichRx(s);
+      const info = s.mode === 0 ? null : stoichCalc(s);
+      if (s.mode === 0) return '<span class="k">กฎทรงมวล</span> ' + rx.eq + " จำนวนอะตอมแต่ละธาตุสองฝั่งต้องเท่ากัน";
+      if (s.mode === 1 && s.flow) return '<span class="k">สะพานโมล</span> กรัม → โมล → คูณอัตราส่วน ' + rx.left[0].c + ":" + rx.right[0].c + " → กรัมผลิตภัณฑ์ = " + fmt(info.prod[0].m, 2) + " g";
+      if (s.mode === 3) return '<span class="k">% yield</span> ' + fmt(info.actual, 2) + " / " + fmt(info.theo, 2) + " × 100 = " + fmt(info.pct, 1) + "%";
+      return '<span class="k">อัตราส่วนโมล</span> ' + rx.eq + " · n/สัมประสิทธิ์ ที่น้อยสุดคือสารกำหนดปริมาณ";
+    },
+    analysis: function (s) {
+      const rx = stoichRx(s);
+      if (s.mode === 0) return "เลขหน้าสารบอกอัตราส่วนโดยโมล ไม่ใช่มวลกรัม " + rx.use;
+      const info = stoichCalc(s);
+      return rx.left[info.lim].f + " หมดก่อน จึงกำหนดปริมาณผลิตภัณฑ์ได้ " + fmt(info.theo, 2) + " g ส่วน " + rx.left[info.ex].f + " เหลือ " + fmt(info.leftM, 2) + " g " + rx.use;
+    },
+    misconception: function (s) {
+      if (s.mode === 0) return "มวลรวมของสารตั้งต้นเท่ากับมวลผลิตภัณฑ์เมื่อสมการดุลแล้วเท่านั้น ถ้ายังไม่ดุล ตาชั่งจะเอียง";
+      if (s.mode === 3) return "ผลได้จริงในการทดลองปกติไม่ควรเกินผลได้ตามทฤษฎี ถ้าชั่งได้มากกว่า 100% มักมีความชื้นหรือสารเจือปน";
+      if (s.mode === 2) return "สารที่มวลกรัมน้อยกว่าไม่ใช่สารกำหนดปริมาณเสมอ ต้องเทียบจำนวนโมลหารด้วยสัมประสิทธิ์ในสมการ";
+      return "สารตั้งต้นจะหมดพร้อมกันก็ต่อเมื่อป้อนในอัตราส่วนเดียวกับสมการ ถ้าไม่พอดีจะมีสารเหลือ";
+    }
+  };
+
+  const GASES = [
+    { id: "He", name: "ฮีเลียม He", mw: 4.003, a: 0.0346, b: 0.0238, color: "#f5e9ff" },
+    { id: "Ne", name: "นีออน Ne", mw: 20.18, a: 0.213, b: 0.0171, color: "#f9a8d4" },
+    { id: "N2", name: "ไนโตรเจน N₂", mw: 28.014, a: 1.39, b: 0.0391, color: "#c4b5fd" },
+    { id: "O2", name: "ออกซิเจน O₂", mw: 32.0, a: 1.36, b: 0.0318, color: "#93c5fd" },
+    { id: "CO2", name: "คาร์บอนไดออกไซด์ CO₂", mw: 44.01, a: 3.59, b: 0.0427, color: "#d8b4fe" },
+    { id: "SO2", name: "ซัลเฟอร์ไดออกไซด์ SO₂", mw: 64.066, a: 6.71, b: 0.0564, color: "#fde68a" }
+  ];
+  const Rgas = 0.082057;
+  function gasBy(id) { return GASES.filter(function (g) { return g.id === id; })[0] || GASES[0]; }
+  function gasT(s) { return s.tempC + 273.15; }
+  function gasState(s) {
+    const T = gasT(s);
+    const g = gasBy(s.gas);
+    let P = s.P;
+    let V = s.V;
+    if (s.lock === "P") V = s.n * Rgas * T / Math.max(s.P, 0.001);
+    else P = s.n * Rgas * T / Math.max(s.V, 0.001);
+    const Pid = s.n * Rgas * T / Math.max(V, 0.001);
+    const nb = s.n * g.b;
+    let Preal = Pid;
+    if (V > nb + 0.05) Preal = s.n * Rgas * T / (V - nb) - g.a * s.n * s.n / (V * V);
+    const Z = s.ideal ? 1 : Preal * V / (s.n * Rgas * T);
+    const ntot = s.n + s.n2;
+    const P1 = ntot > 0 ? s.n / ntot * s.Pmix : 0;
+    const P2 = ntot > 0 ? s.n2 / ntot * s.Pmix : 0;
+    const g2 = gasBy(s.gas2);
+    const v1 = Math.sqrt(3 * 8.314 * T / (g.mw / 1000));
+    const v2 = Math.sqrt(3 * 8.314 * T / (g2.mw / 1000));
+    const meet = 100 * v1 / (v1 + v2);
+    const d = (s.ideal ? P : Preal) * g.mw / (Rgas * T);
+    return { P: P, V: V, T: T, Pid: Pid, Preal: Preal, Z: Z, P1: P1, P2: P2, v1: v1, v2: v2, meet: meet, d: d, Ek: 1.5 * 8.314 * T, g: g, g2: g2 };
+  }
+  window.GasLab = {
+    meta: { title: "แก๊สและสมบัติของแก๊ส", en: "Gases" },
+    modes: ["กฎของแก๊สและ PV = nRT", "ความดันย่อยของดอลตัน", "ทฤษฎีจลน์และการแพร่", "แก๊สจริงเทียบอุดมคติ"],
+    createState: function () {
+      return { mode: 0, playing: true, time: 0, hits: [], gas: "N2", gas2: "He", P: 1, V: 10, tempC: 25, n: 0.4, n2: 0.2, Pmix: 1, lock: "T", ideal: true, vectors: true, parts: [] };
+    },
+    controls: function (s) {
+      const Lc = L();
+      let html = Lc.selectBox("gas", "แก๊สหลัก", s.gas, GASES.map(function (g) { return { id: g.id, name: g.name }; }));
+      if (s.mode === 0) {
+        html += '<div class="seg"><button type="button" class="' + (s.lock === "P" ? "on" : "") + '" data-lock="P">ล็อก P</button><button type="button" class="' + (s.lock === "V" ? "on" : "") + '" data-lock="V">ล็อก V</button><button type="button" class="' + (s.lock === "T" ? "on" : "") + '" data-lock="T">ล็อก T</button></div>';
+      }
+      if (s.mode === 2 || s.mode === 1) html += Lc.selectBox("gas2", "แก๊สที่สอง", s.gas2, GASES.map(function (g) { return { id: g.id, name: g.name }; }));
+      html += Lc.slider("tempC", "อุณหภูมิ (°C)", -100, 500, 1, s.tempC, 0);
+      html += Lc.slider("n", "โมลแก๊สหลัก", 0.1, 5, 0.01, s.n, 2);
+      if (s.lock === "P") html += '<p class="tiny">ล็อกความดัน ปริมาตรเปลี่ยนตามอุณหภูมิ</p>' + Lc.slider("P", "ความดันที่ล็อก (atm)", 0.1, 10, 0.1, s.P, 1);
+      else if (s.lock === "V") html += '<p class="tiny">ล็อกปริมาตร ภาชนะแข็ง ความดันเปลี่ยนตามอุณหภูมิ</p>' + Lc.slider("V", "ปริมาตรที่ล็อก (L)", 1, 50, 0.5, s.V, 1);
+      else html += '<p class="tiny">ล็อกอุณหภูมิ เลื่อนปริมาตรแล้วความดันเปลี่ยนตามกฎของโบยล์</p>' + Lc.slider("V", "ปริมาตร (L)", 1, 50, 0.5, s.V, 1);
+      if (s.mode === 1) {
+        html += Lc.slider("n2", "โมลแก๊สที่สอง", 0.1, 5, 0.01, s.n2, 2);
+        html += Lc.slider("Pmix", "ความดันรวม (atm)", 0.2, 10, 0.1, s.Pmix, 1);
+      }
+      if (s.mode === 3) html += Lc.toggle("ideal", "ใช้แบบจำลองแก๊สอุดมคติ", s.ideal);
+      if (s.mode === 2 || s.mode === 0) html += Lc.toggle("vectors", "แสดงทิศทางความเร็ว", s.vectors);
+      return html;
+    },
+    bind: function (root, s, api) {
+      bindSel(root, s, [["gas", "gas", false], ["gas2", "gas2", false]]);
+      bindNum(root, s, [["P", "P", 1], ["V", "V", 1], ["tempC", "tempC", 0], ["n", "n", 2], ["n2", "n2", 2], ["Pmix", "Pmix", 1]]);
+      bindTog(root, s, ["ideal", "vectors"]);
+      root.querySelectorAll("[data-lock]").forEach(function (btn) { btn.onclick = function () { s.lock = btn.dataset.lock; api.rerender(); }; });
+    },
+    draw: function (ctx, w, h, s, dt) {
+      bg(ctx, w, h);
+      const info = gasState(s);
+      const Txt = L().text;
+      if (s.mode === 2) {
+        const x1 = 36;
+        const tubeW = w - 72;
+        ctx.strokeStyle = "#e9d5ff";
+        ctx.strokeRect(x1, h * 0.42, tubeW, 28);
+        const meetX = x1 + tubeW * info.meet / 100;
+        ctx.fillStyle = info.g.color;
+        ctx.fillRect(x1, h * 0.42, Math.max(0, meetX - x1), 28);
+        ctx.fillStyle = info.g2.color;
+        ctx.fillRect(meetX, h * 0.42, x1 + tubeW - meetX, 28);
+        Txt(ctx, "พบกันที่ " + fmt(info.meet, 1) + " cm จากฝั่ง " + info.g.name, 36, h * 0.38, { color: "#f5e9ff" });
+        Txt(ctx, "อัตรา ∝ 1/√M  โมเลกุลเบากว่าไปได้ไกลกว่าในเวลาเท่ากัน", 36, h * 0.72, { color: "#d8b4fe" });
+        return;
+      }
+      const left = 70;
+      const top = 50;
+      const boxW = Math.min(w * 0.62, 280);
+      const boxH = h * 0.62;
+      const piston = s.mode === 0 ? Math.max(30, boxH * (1 - Math.min(0.85, info.V / 50))) : 36;
+      ctx.strokeStyle = "#e9d5ff";
+      ctx.lineWidth = 3;
+      ctx.strokeRect(left, top + piston, boxW, boxH - piston);
+      ctx.fillStyle = "#4c1d95";
+      ctx.fillRect(left - 8, top + piston - 8, boxW + 16, 12);
+      const count = s.mode === 3 && !s.ideal ? 16 : 22;
+      if (s.parts.length !== count) s.parts = Array.from({ length: count }, function () { return { x: Math.random(), y: Math.random(), vx: Math.random() - 0.5, vy: Math.random() - 0.5 }; });
+      const speed = 40 * Math.sqrt(info.T / 300) * Math.sqrt(28 / info.g.mw);
+      s.parts.forEach(function (p, i) {
+        if (s.playing) { p.x += p.vx * speed * dt * 0.02; p.y += p.vy * speed * dt * 0.02; }
+        if (p.x < 0 || p.x > 1) p.vx *= -1;
+        if (p.y < 0 || p.y > 1) p.vy *= -1;
+        p.x = Math.max(0, Math.min(1, p.x));
+        p.y = Math.max(0, Math.min(1, p.y));
+        const px = left + 12 + p.x * (boxW - 24);
+        const py = top + piston + 12 + p.y * (boxH - piston - 24);
+        const col = s.mode === 1 && i % 2 === 1 ? info.g2.color : info.g.color;
+        const rad = s.mode === 3 && !s.ideal ? 7 : 4;
+        dot(ctx, px, py, rad, col);
+        if (s.vectors && s.mode !== 3) {
+          ctx.strokeStyle = "rgba(255,255,255,0.45)";
+          ctx.beginPath();
+          ctx.moveTo(px, py);
+          ctx.lineTo(px + p.vx * 26, py + p.vy * 26);
+          ctx.stroke();
+        }
+      });
+      Txt(ctx, s.mode === 0 ? "ล็อก " + s.lock + " แล้วตัวที่เหลือคำนวณจาก PV = nRT" : "อนุภาคชนผนังทำให้เกิดความดัน", left, 32, { color: "#f5e9ff" });
+    },
+    chart: function (ctx, w, h, s) {
+      const info = gasState(s);
+      if (s.mode === 1) barsOf(ctx, w, h, [info.P1, info.P2, info.P1 + info.P2], ["P₁", "P₂", "รวม"], ["#c084fc", "#f0abfc", "#e9d5ff"]);
+      else if (s.mode === 2) barsOf(ctx, w, h, [info.v1, info.v2], ["v rms 1", "v rms 2"], ["#c084fc", "#f9a8d4"]);
+      else if (s.mode === 3) barsOf(ctx, w, h, [1, Math.max(0.05, info.Z)], ["Z อุดมคติ", "Z จริง"], ["#86efac", "#f59e0b"]);
+      else {
+        const ysP = [];
+        const ysV = [];
+        for (let i = 1; i <= 8; i++) { const V = i * 4; ysP.push(s.n * Rgas * info.T / V); ysV.push(V); }
+        ctx.clearRect(0, 0, w, h);
+        ctx.strokeStyle = "#e9d5ff";
+        ctx.beginPath();
+        ysP.forEach(function (P, i) {
+          const X = 30 + i * ((w - 50) / 7);
+          const Y = h - 24 - (P / (ysP[0] || 1)) * (h - 40);
+          if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+        });
+        ctx.stroke();
+        L().text(ctx, "P ลดเมื่อ V เพิ่ม (T, n คงที่)", 16, 16, { color: "#d8b4fe", font: "12px Segoe UI, Leelawadee UI" });
+      }
+    },
+    readout: function (s) {
+      const info = gasState(s);
+      if (s.mode === 1) return metric(fmt(info.P1, 3), "P₁ atm") + metric(fmt(info.P2, 3), "P₂ atm") + metric(fmt(info.P1 + info.P2, 3), "P รวม");
+      if (s.mode === 2) return metric(fmt(info.v1, 0), "v₁ m/s") + metric(fmt(info.v2, 0), "v₂ m/s") + metric(fmt(info.meet, 1), "จุดพบ cm");
+      if (s.mode === 3) return metric(fmt(info.Pid, 3), "P อุดมคติ") + metric(fmt(info.Preal, 3), "P จริง") + metric(fmt(info.Z, 3), "Z");
+      return metric(fmt(info.P, 3), "P atm") + metric(fmt(info.V, 2), "V L") + metric(fmt(info.T, 2), "T K");
+    },
+    equation: function (s) {
+      const info = gasState(s);
+      if (s.mode === 1) return '<span class="k">ดอลตัน</span> Pᵢ = Xᵢ P รวม · X₁ = ' + fmt(s.n / (s.n + s.n2), 3);
+      if (s.mode === 2) return '<span class="k">เกรแฮม</span> r₁/r₂ = √(M₂/M₁) = ' + fmt(info.v1 / info.v2, 3) + " · Ek เฉลี่ย = " + fmt(info.Ek / 1000, 2) + " kJ/mol";
+      if (s.mode === 3) return '<span class="k">แวนเดอร์วาลส์</span> (P + an²/V²)(V − nb) = nRT · Z = PV/nRT = ' + fmt(info.Z, 3);
+      return '<span class="k">แก๊สอุดมคติ</span> PV = nRT · ความหนาแน่น d = ' + fmt(info.d, 3) + " g/L · T = " + fmt(s.tempC, 0) + " °C = " + fmt(info.T, 2) + " K";
+    },
+    analysis: function (s) {
+      const info = gasState(s);
+      if (info.T < 0) return "อุณหภูมิเคลวินติดลบไม่ได้ ตรวจค่า P V n ที่ล็อกไว้";
+      if (s.mode === 0 && s.lock === "V") return "ปริมาตรถูกล็อกเหมือนภาชนะแข็ง เมื่อเพิ่มอุณหภูมิความดันต้องสูงขึ้น ไม่ใช่ปริมาตร";
+      if (s.mode === 2) return info.g.mw < info.g2.mw ? info.g.name + " เบากว่า จึงแพร่ได้เร็วกว่าและไปได้ไกลกว่าในหลอด" : info.g2.name + " เบากว่า จึงไปได้ไกลกว่า";
+      if (s.mode === 3) return Math.abs(info.Z - 1) > 0.05 ? "Z ห่างจาก 1 แปลว่าแก๊สจริงเบี่ยงเบนชัด ที่ความดันสูงหรืออุณหภูมิต่ำ" : "สภาวะนี้ยังใกล้แก๊สอุดมคติ Z ใกล้ 1";
+      return "ใช้กับถังแก๊ส บอลลูน และกระป๋องสเปรย์ ต้องแปลงอุณหภูมิเป็นเคลวินก่อนคำนวณ";
+    },
+    misconception: function (s) {
+      if (s.tempC < 0 && s.mode === 0) return "ใส่ค่าติดลบองศาเซลเซียสตรง ๆ ใน PV = nRT ไม่ได้ ต้องบวก 273.15 เป็นเคลวินก่อน";
+      if (s.mode === 2) return "อุณหภูมิเดียวกันทำให้พลังงานจลน์เฉลี่ยเท่ากัน แต่แก๊สที่มวลโมเลกุลน้อยกว่าจะมีความเร็วสูงกว่า";
+      if (s.lock === "V") return "ถ้าภาชนะแข็งเกร็ง ให้ความร้อนแล้วปริมาตรไม่เพิ่ม ความดันต่างหากที่สูงขึ้น";
+      return "แก๊สจริงมีปริมาตรโมเลกุลและแรงดึงดูด จึงไม่เป็นไปตาม PV = nRT ทุกสภาวะ";
+    }
+  };
+
+  function arrheniusK(Ea, T, cat) {
+    const ea = (cat ? Ea * 0.55 : Ea) * 1000;
+    return 1e7 * Math.exp(-ea / (8.314 * T));
+  }
+  window.RateLab = {
+    meta: { title: "อัตราการเกิดปฏิกิริยาเคมี", en: "Reaction Rates" },
+    modes: ["ทฤษฎีการชน", "ปัจจัยที่มีผลต่ออัตรา", "แผนภาพพลังงาน", "กฎอัตราและอาร์เรเนียส"],
+    createState: function () {
+      return { mode: 0, playing: true, time: 0, hits: [], conc: 1, temp: 298, ea: 50, dH: -20, surface: 1, cat: false, exo: true, order: 1, showMB: true, live: 1, success: 0, tries: 0, parts: [] };
+    },
+    controls: function (s) {
+      const Lc = L();
+      let html = Lc.selectBox("demo", "ปฏิกิริยาตัวอย่าง", s.exo ? "exo" : "endo", [{ id: "exo", name: "คายความร้อน เช่น การเผาไหม้" }, { id: "endo", name: "ดูดความร้อน เช่น การสลายตัว" }]);
+      html += Lc.slider("conc", "ความเข้มข้น [A] (mol/L)", 0.1, 2, 0.1, s.conc, 1);
+      html += Lc.slider("temp", "อุณหภูมิ (K)", 273, 373, 1, s.temp, 0);
+      html += Lc.slider("ea", "Ea (kJ/mol)", 20, 100, 5, s.ea, 0);
+      if (s.mode === 2) html += Lc.slider("dH", "ΔH (kJ/mol)", -50, 50, 5, s.dH, 0);
+      if (s.mode === 1) html += Lc.selectBox("surface", "พื้นที่ผิว", String(s.surface), [{ id: "1", name: "ก้อนใหญ่" }, { id: "3", name: "ชิ้นเล็ก" }, { id: "8", name: "ผงละเอียด" }]);
+      if (s.mode === 3) html += Lc.selectBox("order", "อันดับปฏิกิริยา", String(s.order), [{ id: "0", name: "อันดับ 0" }, { id: "1", name: "อันดับ 1" }, { id: "2", name: "อันดับ 2" }]);
+      html += Lc.toggle("cat", "เปิดตัวเร่งปฏิกิริยา", s.cat);
+      if (s.mode === 3) html += Lc.toggle("showMB", "เทียบเส้นแมกซ์เวลล์สองอุณหภูมิ", s.showMB);
+      return html;
+    },
+    bind: function (root, s, api) {
+      const demo = root.querySelector("#demo");
+      if (demo) demo.onchange = function () { s.exo = demo.value === "exo"; s.dH = s.exo ? -Math.abs(s.dH || 20) : Math.abs(s.dH || 20); if (api) api.rerender(); };
+      bindNum(root, s, [["conc", "conc", 1], ["temp", "temp", 0], ["ea", "ea", 0], ["dH", "dH", 0]]);
+      const conc = root.querySelector("#conc");
+      if (conc) conc.oninput = function () { s.conc = Number(conc.value); s.live = s.conc; const lb = root.querySelector("#lb-conc"); if (lb) lb.textContent = s.conc.toFixed(1); };
+      bindSel(root, s, [["surface", "surface", true], ["order", "order", true]]);
+      bindTog(root, s, ["cat", "showMB"]);
+    },
+    draw: function (ctx, w, h, s, dt) {
+      bg(ctx, w, h);
+      const k = arrheniusK(s.ea, s.temp, s.cat) * (s.mode === 1 ? s.surface : 1);
+      const rate = k * Math.pow(Math.max(s.live, 0), s.order);
+      if (s.playing) s.live = Math.max(0, s.live - Math.min(s.live * 0.06, rate * dt));
+      const Txt = L().text;
+      if (s.mode === 2) {
+        const base = h * 0.72;
+        ctx.strokeStyle = "#e9d5ff";
+        ctx.beginPath();
+        ctx.moveTo(40, base);
+        ctx.lineTo(w * 0.45, base - 80);
+        const peak = base - 80 - Math.max(-40, s.dH);
+        ctx.lineTo(w * 0.5, base - 150);
+        ctx.lineTo(w * 0.72, base - (s.exo ? 40 : -10));
+        ctx.stroke();
+        if (s.cat) {
+          ctx.strokeStyle = "#86efac";
+          ctx.beginPath();
+          ctx.moveTo(40, base);
+          ctx.lineTo(w * 0.48, base - 90);
+          ctx.lineTo(w * 0.72, base - (s.exo ? 40 : -10));
+          ctx.stroke();
+        }
+        const ballX = 40 + ((s.time * 40) % (w * 0.55));
+        dot(ctx, ballX, base - 70, 8, "#f0abfc");
+        Txt(ctx, "Ea " + s.ea + " kJ/mol" + (s.cat ? " เส้นเขียวคือมีตัวเร่ง Ea ต่ำลง" : ""), 24, 36, { color: "#f5e9ff" });
+        Txt(ctx, "ΔH = " + s.dH + " kJ/mol", 24, 58, { color: "#d8b4fe" });
+        return;
+      }
+      if (s.mode === 3) {
+        function curve(Temp, color) {
+          ctx.strokeStyle = color;
+          ctx.beginPath();
+          for (let i = 0; i < 60; i++) {
+            const E = i * 2;
+            const yv = Math.sqrt(E) * Math.exp(-E * 1000 / (8.314 * Temp));
+            const X = 30 + i * ((w - 50) / 60);
+            const Y = h * 0.75 - yv * 180;
+            if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+          }
+          ctx.stroke();
+        }
+        curve(s.temp, "#e9d5ff");
+        if (s.showMB) curve(Math.min(373, s.temp + 40), "#f0abfc");
+        const xEa = 30 + (s.ea / 2) * ((w - 50) / 60);
+        ctx.strokeStyle = "#f59e0b";
+        ctx.beginPath();
+        ctx.moveTo(xEa, 40);
+        ctx.lineTo(xEa, h * 0.75);
+        ctx.stroke();
+        Txt(ctx, "พื้นที่ทางขวาของเส้น Ea คือส่วนที่ชนแล้วเกิดปฏิกิริยาได้", 20, 28, { color: "#fde68a" });
+        return;
+      }
+      const n = Math.max(4, Math.round(s.live * 10));
+      if (s.parts.length !== n) s.parts = Array.from({ length: n }, function () { return { x: Math.random(), y: Math.random(), vx: Math.random() - 0.5, vy: Math.random() - 0.5, ok: false }; });
+      const sp = 30 * Math.sqrt(s.temp / 298);
+      s.parts.forEach(function (p) {
+        if (s.playing) { p.x += p.vx * sp * dt * 0.03; p.y += p.vy * sp * dt * 0.03; }
+        if (p.x < 0 || p.x > 1) p.vx *= -1;
+        if (p.y < 0 || p.y > 1) p.vy *= -1;
+        p.x = Math.max(0, Math.min(1, p.x));
+        p.y = Math.max(0, Math.min(1, p.y));
+        dot(ctx, 30 + p.x * (w - 60), 40 + p.y * (h - 80), 6, p.ok ? "#86efac" : "#e9d5ff");
+      });
+      if (s.playing && s.parts.length > 1 && Math.random() < 0.2) {
+        s.tries += 1;
+        const win = Math.random() < Math.exp(-(s.cat ? s.ea * 0.55 : s.ea) * 8 / s.temp);
+        if (win) { s.success += 1; s.parts[0].ok = true; }
+      }
+      Txt(ctx, "ชนสำเร็จ " + s.success + " จาก " + s.tries, 20, h - 16, { color: "#f5e9ff" });
+    },
+    chart: function (ctx, w, h, s) {
+      if (s.mode === 2 || s.mode === 3) {
+        const ks = [];
+        for (let i = 0; i < 6; i++) {
+          const T = 280 + i * 18;
+          ks.push(Math.log(Math.max(1e-12, arrheniusK(s.ea, T, s.cat))));
+        }
+        barsOf(ctx, w, h, ks.map(function (v) { return v - ks[0] + 0.2; }), ["T1", "T2", "T3", "T4", "T5", "T6"], ["#c084fc"]);
+        return;
+      }
+      const c0 = Math.max(0.05, s.conc);
+      const left = Math.max(0, s.live);
+      barsOf(ctx, w, h, [c0, left, Math.max(0, c0 - left)], ["[A] เริ่ม", "[A] ตอนนี้", "ผลิตภัณฑ์"], ["#c084fc", "#f59e0b", "#86efac"]);
+    },
+    readout: function (s) {
+      const k = arrheniusK(s.ea, s.temp, s.cat) * (s.mode === 1 ? s.surface : 1);
+      const rate = k * Math.pow(Math.max(s.live, 0), s.order);
+      const hit = s.tries ? Math.round(100 * s.success / s.tries) : 0;
+      return metric(fmt(rate, 4), "อัตรา") + metric(fmt(k, 4), "k") + metric(hit + "%", "ชนสำเร็จ");
+    },
+    equation: function (s) {
+      const k = arrheniusK(s.ea, s.temp, s.cat);
+      if (s.mode === 2) return '<span class="k">พลังงาน</span> Ea ไปข้างหน้า − Ea ย้อนกลับ = ΔH = ' + s.dH + " kJ/mol ตัวเร่งลด Ea ทั้งสองทาง";
+      if (s.mode === 3) return '<span class="k">อาร์เรเนียส</span> k = A e^(−Ea/RT) = ' + fmt(k, 4) + " · r = k[A]^" + s.order;
+      return '<span class="k">อัตรา</span> r = −Δ[A]/Δt = ' + fmt(k * Math.pow(Math.max(s.live, 0), s.order), 4) + " mol/L·s";
+    },
+    analysis: function (s) {
+      if (s.mode === 1) return "ผงละเอียดเพิ่มพื้นที่ผิว ของเหลวร้อนหรือเข้มขึ้นชนกันบ่อยขึ้น ตัวเร่งเปิดทางที่ Ea ต่ำลง";
+      if (s.cat) return "ตัวเร่งทำให้เข้าใกล้ผลิตภัณฑ์เร็วขึ้น แต่ปริมาณสูงสุดตามปริมาณสารสัมพันธ์ไม่เพิ่ม";
+      return "เมื่อสารตั้งต้นเหลือน้อย อัตราจะลดลงเองแม้จะไม่เปลี่ยนอุณหภูมิ";
+    },
+    misconception: function (s) {
+      if (s.cat) return "ตัวเร่งไม่ได้ทำให้ได้ผลิตภัณฑ์มากขึ้นกว่าที่สมการกำหนด มันแค่ลดเวลาที่ต้องรอ";
+      if (s.temp > 330) return "เพิ่มอุณหภูมิแล้ว Ea ไม่ได้ลดลง Ea เป็นสมบัติของเส้นทางปฏิกิริยา อุณหภูมิเพิ่มสัดส่วนอนุภาคที่พลังงานพอจะข้าม Ea";
+      return "อัตราไม่คงที่ตลอดปฏิกิริยา เพราะความเข้มข้นของสารตั้งต้นลดลงเรื่อย ๆ";
+    }
+  };
+
+  const EQS = [
+    { name: "2NO₂ ⇌ N₂O₄", a: 2, b: 0, c: 1, d: 0, dH: -57, K298: 6.5, names: ["NO₂", "—", "N₂O₄", "—"], color: true },
+    { name: "PCl₅ ⇌ PCl₃ + Cl₂", a: 1, b: 0, c: 1, d: 1, dH: 92, K298: 0.03, names: ["PCl₅", "—", "PCl₃", "Cl₂"], color: false },
+    { name: "N₂ + 3H₂ ⇌ 2NH₃", a: 1, b: 3, c: 2, d: 0, dH: -92, K298: 4.2e8, names: ["N₂", "H₂", "NH₃", "—"], color: false }
+  ];
+  function eqK(rx, T) {
+    const R = 8.314;
+    return rx.K298 * Math.exp(-(rx.dH * 1000) / R * (1 / T - 1 / 298.15));
+  }
+  function eqQ(rx, c) {
+    const num = Math.pow(c[2], rx.c) * (rx.d ? Math.pow(c[3], rx.d) : 1);
+    const den = Math.pow(Math.max(c[0], 1e-9), rx.a) * (rx.b ? Math.pow(Math.max(c[1], 1e-9), rx.b) : 1);
+    return num / den;
+  }
+  function eqStep(s, dt) {
+    const rx = EQS[s.eq] || EQS[0];
+    const K = Math.max(1e-8, Math.min(1e12, eqK(rx, s.temp)));
+    const V = s.vol;
+    const c = s.n.map(function (n) { return Math.max(n, 0) / V; });
+    const boost = s.cat ? 8 : 1;
+    const rf = 0.08 * boost * Math.pow(c[0], rx.a) * (rx.b ? Math.pow(c[1], rx.b) : 1);
+    const rr = rf / K * Math.pow(c[2], rx.c) * (rx.d ? Math.pow(c[3], rx.d) : 1) * K / Math.max(K, 1e-12) * K;
+    const forward = 0.08 * boost * Math.pow(Math.max(c[0], 0), rx.a) * (rx.b ? Math.pow(Math.max(c[1], 0), rx.b) : 1);
+    const back = (0.08 * boost / K) * Math.pow(Math.max(c[2], 0), rx.c) * (rx.d ? Math.pow(Math.max(c[3], 0), rx.d) : 1);
+    let xi = (forward - back) * dt;
+    xi = Math.max(-0.03, Math.min(0.03, xi));
+    const dn = [-rx.a * xi, -rx.b * xi, rx.c * xi, rx.d * xi];
+    for (let i = 0; i < 4; i++) {
+      if (s.n[i] + dn[i] < 0) xi = 0;
+    }
+    if (xi !== 0) {
+      s.n[0] = Math.max(0, s.n[0] - rx.a * xi);
+      s.n[1] = Math.max(0, s.n[1] - rx.b * xi);
+      s.n[2] = Math.max(0, s.n[2] + rx.c * xi);
+      s.n[3] = Math.max(0, s.n[3] + rx.d * xi);
+    }
+    s._rf = forward;
+    s._rr = back;
+    s._K = K;
+    s._Q = eqQ(rx, s.n.map(function (n) { return Math.max(n, 0) / V; }));
+  }
+  window.EqLab = {
+    meta: { title: "สมดุลเคมี", en: "Equilibrium" },
+    modes: ["สมดุลไดนามิก", "หลักของเลอชาเตอลิเอ", "เปรียบเทียบ Q กับ K", "อนุภาคในภาวะสมดุล"],
+    createState: function () {
+      return { mode: 0, playing: true, time: 0, hits: [], eq: 0, vol: 1, temp: 298, cat: false, exo: true, n: [1, 1, 0.05, 0.05], parts: [] };
+    },
+    controls: function (s) {
+      const Lc = L();
+      const rx = EQS[s.eq];
+      let html = Lc.selectBox("eq", "ปฏิกิริยา", String(s.eq), EQS.map(function (r, i) { return { id: String(i), name: r.name }; }));
+      html += Lc.slider("temp", "อุณหภูมิ (K)", 273, 500, 1, s.temp, 0);
+      html += Lc.slider("vol", "ปริมาตร (L)", 0.5, 5, 0.1, s.vol, 1);
+      html += Lc.slider("n0", rx.names[0] + " (mol)", 0, 2, 0.05, s.n[0], 2);
+      if (rx.b) html += Lc.slider("n1", rx.names[1] + " (mol)", 0, 2, 0.05, s.n[1], 2);
+      html += Lc.slider("n2", rx.names[2] + " (mol)", 0, 2, 0.05, s.n[2], 2);
+      if (rx.d) html += Lc.slider("n3", rx.names[3] + " (mol)", 0, 2, 0.05, s.n[3], 2);
+      html += Lc.toggle("cat", "เปิดตัวเร่งปฏิกิริยา", s.cat);
+      return html;
+    },
+    bind: function (root, s) {
+      bindSel(root, s, [["eq", "eq", true, function (st) { st.n = [1, 1, 0.05, 0.05]; }]]);
+      [["n0", 0], ["n1", 1], ["n2", 2], ["n3", 3]].forEach(function (pair) {
+        const el = root.querySelector("#" + pair[0]);
+        const lb = root.querySelector("#lb-" + pair[0]);
+        if (!el) return;
+        el.oninput = function () { s.n[pair[1]] = Number(el.value); if (lb) lb.textContent = s.n[pair[1]].toFixed(2); };
+      });
+      bindNum(root, s, [["temp", "temp", 0], ["vol", "vol", 1]]);
+      bindTog(root, s, ["cat"]);
+    },
+    draw: function (ctx, w, h, s, dt) {
+      bg(ctx, w, h);
+      if (s.playing) eqStep(s, dt || 0.016);
+      const rx = EQS[s.eq];
+      const Txt = L().text;
+      const boxW = s.mode === 1 ? Math.max(80, w * 0.5 * (s.vol / 3)) : w * 0.7;
+      ctx.strokeStyle = "#e9d5ff";
+      ctx.strokeRect((w - boxW) / 2, 50, boxW, h * 0.62);
+      const frac = s.n[0] / Math.max(0.01, s.n[0] + s.n[2]);
+      if (rx.color) ctx.fillStyle = "rgba(120,50,20," + (0.15 + frac * 0.55) + ")";
+      else ctx.fillStyle = "rgba(192,132,252,0.18)";
+      ctx.fillRect((w - boxW) / 2, 50, boxW, h * 0.62);
+      const total = Math.min(24, Math.round((s.n[0] + s.n[2]) * 6 + 4));
+      for (let i = 0; i < total; i++) {
+        const prod = i / total > frac;
+        dot(ctx, (w - boxW) / 2 + 16 + (i % 8) * 18, 70 + Math.floor(i / 8) * 22 + Math.sin(s.time * 3 + i) * 3, prod ? 7 : 4, prod ? "#86efac" : "#f0abfc");
+      }
+      const shift = s._Q < s._K * 0.98 ? "ไปข้างหน้า" : s._Q > s._K * 1.02 ? "ย้อนกลับ" : "สมดุล";
+      Txt(ctx, rx.name + " · " + shift, 16, 28, { color: "#f5e9ff" });
+      if (s.mode === 2) {
+        const tilt = shift === "ไปข้างหน้า" ? -12 : shift === "ย้อนกลับ" ? 12 : 0;
+        ctx.save();
+        ctx.translate(w * 0.5, h * 0.9);
+        ctx.rotate(tilt * Math.PI / 180);
+        ctx.fillStyle = "#c084fc";
+        ctx.fillRect(-70, 0, 140, 6);
+        ctx.restore();
+        Txt(ctx, "Q " + fmt(s._Q, 2) + "   K " + fmt(s._K, 2), 16, h - 12, { color: "#fde68a" });
+      }
+    },
+    chart: function (ctx, w, h, s) {
+      const rx = EQS[s.eq];
+      const c = s.n.map(function (n) { return n / s.vol; });
+      if (s.mode === 0 || s.mode === 1) barsOf(ctx, w, h, [s._rf || 0, s._rr || 0], ["rf", "rr"], ["#c084fc", "#86efac"]);
+      else barsOf(ctx, w, h, [c[0], c[2], s._K || 0].map(function (v) { return Math.min(v, 20); }), [rx.names[0], rx.names[2], "K"], ["#f0abfc", "#86efac", "#fde68a"]);
+    },
+    readout: function (s) {
+      return metric(fmt(s._K, 3), "K") + metric(fmt(s._Q, 3), "Q") + metric(fmt(s._rf || 0, 3) + "/" + fmt(s._rr || 0, 3), "rf/rr");
+    },
+    equation: function (s) {
+      const rx = EQS[s.eq];
+      return '<span class="k">สมดุล</span> ' + rx.name + " · K ที่ " + fmt(s.temp, 0) + " K = " + fmt(s._K, 3) + " · Q = " + fmt(s._Q, 3);
+    },
+    analysis: function (s) {
+      const rx = EQS[s.eq];
+      if (!s._K) return "กดเล่นเพื่อให้ระบบเดินเข้าสู่สมดุล";
+      const dir = s._Q < s._K * 0.98 ? "ยังไปข้างหน้าเพราะ Q < K" : s._Q > s._K * 1.02 ? "ย้อนกลับเพราะ Q > K" : "อยู่ในสมดุล Q ≈ K ความเข้มข้นคงที่แต่อนุภาคยังเปลี่ยนไปมา";
+      const haber = rx.name.indexOf("NH₃") >= 0 ? " กระบวนการฮาเบอร์เลือกอุณหภูมิที่ไม่ต่ำเกินไป เพื่อให้ปฏิกิริยายังเกิดเร็ว แม้ค่า K จะลดลงเมื่อร้อนขึ้น" : "";
+      return dir + " ตัวเร่ง" + (s.cat ? "เร่งทั้งสองทางเท่ากัน จึงไม่เปลี่ยน K" : "ยังปิดอยู่") + haber;
+    },
+    misconception: function (s) {
+      if (s.cat) return "ตัวเร่งไม่เพิ่มค่า K และไม่ได้ทำให้ได้ผลิตภัณฑ์มากกว่าจุดสมดุลเดิม แค่ไปถึงสมดุลเร็วขึ้น";
+      if (s.mode === 1 && s.vol < 1.2) return "การลดปริมาตรหรือเพิ่มความดันไม่เปลี่ยนค่า K มีแต่ทำให้องค์ประกอบเลื่อนไปทางฝั่งที่โมลแก๊สน้อยกว่า";
+      if (Math.abs(s.temp - 298) > 15) return "มีเพียงอุณหภูมิที่เปลี่ยนค่าคงที่สมดุล K ความเข้มข้นและความดันเปลี่ยนแค่ Q และตำแหน่งสมดุล";
+      return "ที่สมดุลความเข้มข้นของสารตั้งต้นกับผลิตภัณฑ์ไม่จำเป็นต้องเท่ากัน แค่ต้องคงที่";
+    }
+  };
+
+  const ACIDS = [
+    { id: "HCl", name: "HCl กรดแก่", acid: true, strong: true, K: 1 },
+    { id: "CH3COOH", name: "CH₃COOH กรดอ่อน", acid: true, strong: false, K: 1.8e-5 },
+    { id: "HF", name: "HF กรดอ่อน", acid: true, strong: false, K: 6.8e-4 },
+    { id: "NaOH", name: "NaOH เบสแก่", acid: false, strong: true, K: 1 },
+    { id: "NH3", name: "NH₃ เบสอ่อน", acid: false, strong: false, K: 1.8e-5 }
+  ];
+  function acidBy(id) { return ACIDS.filter(function (a) { return a.id === id; })[0] || ACIDS[0]; }
+  function quadPos(K, C) {
+    return (-K + Math.sqrt(K * K + 4 * K * Math.max(C, 0))) / 2;
+  }
+  function pHOf(sub, C) {
+    const Kw = 1e-14;
+    if (C <= 0) return 7;
+    if (sub.acid && sub.strong) {
+      const H = (C + Math.sqrt(C * C + 4 * Kw)) / 2;
+      return -Math.log10(H);
+    }
+    if (!sub.acid && sub.strong) {
+      const OH = (C + Math.sqrt(C * C + 4 * Kw)) / 2;
+      return 14 + Math.log10(OH);
+    }
+    if (sub.acid) return -Math.log10(Math.max(quadPos(sub.K, C), 1e-14));
+    const OH = quadPos(sub.K, C);
+    return 14 + Math.log10(Math.max(OH, 1e-14));
+  }
+  function titrationPH(s) {
+    const analyte = acidBy(s.acidId);
+    const Va = s.va / 1000;
+    const Vb = s.vb / 1000;
+    const V = Math.max(Va + Vb, 1e-9);
+    const na = s.ca * Va;
+    const nb = s.cb * Vb;
+    if (!analyte.acid && analyte.strong) {
+      if (Math.abs(na - nb) < 1e-8) return 7;
+      if (nb < na) return 14 + Math.log10((na - nb) / V);
+      return -Math.log10((nb - na) / V);
+    }
+    if (!analyte.acid) {
+      const pKb = -Math.log10(analyte.K);
+      if (nb <= 1e-8) return pHOf(analyte, na / V);
+      if (nb < na * 0.995) return 14 - (pKb + Math.log10(nb / (na - nb)));
+      if (nb <= na * 1.005) return -Math.log10(Math.max(Math.sqrt((1e-14 / analyte.K) * na / V), 1e-14));
+      return -Math.log10((nb - na) / V);
+    }
+    if (analyte.strong) {
+      if (Math.abs(na - nb) < 1e-8) return 7;
+      if (na > nb) return -Math.log10((na - nb) / V);
+      return 14 + Math.log10((nb - na) / V);
+    }
+    const pKa = -Math.log10(analyte.K);
+    if (nb <= 1e-8) return pHOf(analyte, na / V);
+    if (nb < na * 0.995) return pKa + Math.log10(nb / (na - nb));
+    if (nb <= na * 1.005) return 14 + Math.log10(Math.max(Math.sqrt((1e-14 / analyte.K) * na / V), 1e-14));
+    return 14 + Math.log10((nb - na) / V);
+  }
+  function bufferPH(s) {
+    const sub = acidBy(s.acidId);
+    const Ka = sub.acid ? (sub.strong ? 1 : sub.K) : 1e-14 / sub.K;
+    return -Math.log10(Ka) + Math.log10(Math.max(s.a, 1e-6) / Math.max(s.ha, 1e-6));
+  }
+  function currentPH(s) {
+    if (s.mode === 1) return titrationPH(s);
+    if (s.mode === 2) return bufferPH(s);
+    return pHOf(acidBy(s.acidId), s.ca);
+  }
+  function phColor(pH) {
+    if (pH < 3) return "#ef4444";
+    if (pH < 5) return "#f97316";
+    if (pH < 6.5) return "#facc15";
+    if (pH < 8) return "#4ade80";
+    if (pH < 10) return "#38bdf8";
+    return "#818cf8";
+  }
+  window.AcidLab = {
+    meta: { title: "กรด-เบส", en: "Acids and Bases" },
+    modes: ["การแตกตัวและ pH", "กราฟไทเทรต", "สารละลายบัฟเฟอร์", "อินดิเคเตอร์"],
+    createState: function () {
+      return { mode: 0, playing: true, time: 0, hits: [], acidId: "CH3COOH", ca: 0.1, va: 25, cb: 0.1, vb: 0, ha: 0.1, a: 0.1, indicator: "pp", ions: true, auto: false };
+    },
+    controls: function (s) {
+      const Lc = L();
+      let html = Lc.selectBox("acidId", "สาร", s.acidId, ACIDS.map(function (a) { return { id: a.id, name: a.name }; }));
+      html += Lc.slider("ca", "ความเข้มข้น (mol/L)", 0.001, 1, 0.001, s.ca, 3);
+      if (s.mode === 1) {
+        html += Lc.slider("va", "ปริมาตรกรด (mL)", 10, 100, 5, s.va, 0);
+        html += Lc.slider("cb", "ความเข้มข้นเบสแก่ (mol/L)", 0.01, 1, 0.01, s.cb, 2);
+        html += Lc.slider("vb", "ปริมาตรเบสที่หยด (mL)", 0, 100, 0.1, s.vb, 1);
+        html += Lc.toggle("auto", "หยดอัตโนมัติ", s.auto);
+      }
+      if (s.mode === 2) {
+        html += Lc.slider("ha", "[HA] (mol/L)", 0.01, 1, 0.01, s.ha, 2);
+        html += Lc.slider("a", "[A⁻] (mol/L)", 0.01, 1, 0.01, s.a, 2);
+      }
+      if (s.mode === 3 || s.mode === 1) {
+        html += Lc.selectBox("indicator", "อินดิเคเตอร์", s.indicator, [
+          { id: "mo", name: "เมทิลออเรนจ์" },
+          { id: "lit", name: "ลิตมัส" },
+          { id: "pp", name: "ฟีนอล์ฟทาลีน" },
+          { id: "uni", name: "ยูนิเวอร์ซัล" }
+        ]);
+      }
+      html += Lc.toggle("ions", "แสดงไอออนในบีกเกอร์", s.ions);
+      return html;
+    },
+    bind: function (root, s) {
+      bindSel(root, s, [["acidId", "acidId", false], ["indicator", "indicator", false]]);
+      bindNum(root, s, [["ca", "ca", 3], ["va", "va", 0], ["cb", "cb", 2], ["vb", "vb", 1], ["ha", "ha", 2], ["a", "a", 2]]);
+      bindTog(root, s, ["ions", "auto"]);
+    },
+    draw: function (ctx, w, h, s, dt) {
+      bg(ctx, w, h);
+      if (s.mode === 1 && s.auto && s.playing) s.vb = Math.min(100, s.vb + dt * 4);
+      const sub = acidBy(s.acidId);
+      const pH = currentPH(s);
+      const col = s.indicator === "pp" ? (pH >= 8.2 ? "#f472b6" : "rgba(255,255,255,0.15)") : s.indicator === "mo" ? (pH < 3.1 ? "#ef4444" : pH > 4.4 ? "#facc15" : "#f97316") : s.indicator === "lit" ? (pH < 5 ? "#ef4444" : pH > 8 ? "#60a5fa" : "#a78bfa") : phColor(pH);
+      L().drawBeaker(ctx, w * 0.32, 36, Math.min(180, w * 0.36), h * 0.7, 0.62, col);
+      if (s.mode === 1) {
+        ctx.strokeStyle = "#e9d5ff";
+        ctx.strokeRect(w * 0.48, 16, 18, h * 0.35);
+        dot(ctx, w * 0.49 + 8, 20 + (s.time * 30 % (h * 0.3)), 4, "#ddd6fe");
+      }
+      if (s.ions) {
+        const n = sub.strong ? 10 : 4;
+        for (let i = 0; i < n; i++) dot(ctx, w * 0.38 + (i % 4) * 16, h * 0.55 + Math.floor(i / 4) * 16, 4, sub.acid ? "#fecaca" : "#bfdbfe");
+      }
+      L().text(ctx, "pH " + fmt(pH, 2), w * 0.32, h - 16, { color: "#f5e9ff", font: "18px Segoe UI, Leelawadee UI" });
+    },
+    chart: function (ctx, w, h, s) {
+      ctx.clearRect(0, 0, w, h);
+      if (s.mode !== 1 && s.mode !== 3) {
+        const sub = acidBy(s.acidId);
+        const pHs = [0.001, 0.01, 0.05, 0.1, 0.5].map(function (c) { return pHOf(sub, c); });
+        barsOf(ctx, w, h, pHs, ["0.001", "0.01", "0.05", "0.1", "0.5"], ["#c084fc"]);
+        return;
+      }
+      ctx.strokeStyle = "#e9d5ff";
+      ctx.beginPath();
+      const saved = s.vb;
+      for (let i = 0; i <= 40; i++) {
+        s.vb = i * 2;
+        const pH = titrationPH(s);
+        const X = 20 + i * ((w - 36) / 40);
+        const Y = h - 16 - (pH / 14) * (h - 32);
+        if (i === 0) ctx.moveTo(X, Y); else ctx.lineTo(X, Y);
+      }
+      s.vb = saved;
+      ctx.stroke();
+      const xNow = 20 + (saved / 80) * (w - 36);
+      ctx.strokeStyle = "#f0abfc";
+      ctx.beginPath();
+      ctx.moveTo(xNow, 12);
+      ctx.lineTo(xNow, h - 16);
+      ctx.stroke();
+    },
+    readout: function (s) {
+      const sub = acidBy(s.acidId);
+      const pH = currentPH(s);
+      const H = Math.pow(10, -pH);
+      const OH = 1e-14 / H;
+      const free = sub.acid ? H : OH;
+      const ion = sub.strong ? 100 : Math.min(100, free / Math.max(s.ca, 1e-9) * 100);
+      return metric(fmt(pH, 2), "pH") + metric(fmt(OH, 3), "[OH⁻]") + metric(sub.strong ? "100" : fmt(ion, 2), "% แตกตัว");
+    },
+    equation: function (s) {
+      const sub = acidBy(s.acidId);
+      if (s.mode === 2) return '<span class="k">บัฟเฟอร์</span> pH = pKa + log([คู่เบส]/[คู่กรด]) = ' + fmt(bufferPH(s), 2);
+      if (s.mode === 1) return '<span class="k">ไทเทรต</span> pH ขณะนี้ ' + fmt(titrationPH(s), 2) + " ที่ไทแทรนต์ " + fmt(s.vb, 1) + " mL";
+      return '<span class="k">pH</span> pH = −log[H₃O⁺] · Kw = 1.0×10⁻¹⁴ ที่ 25 °C · สารนี้' + (sub.strong ? "แตกตัวเกือบสมบูรณ์" : "มี K = " + sub.K.toExponential(1));
+    },
+    analysis: function (s) {
+      const pH = currentPH(s);
+      const kind = pH < 6.5 ? "เป็นกรด" : pH > 7.5 ? "เป็นเบส" : "ใกล้กลาง";
+      if (s.mode === 2) return "บัฟเฟอร์ต้าน pH ได้เมื่อเติมกรดหรือเบสเล็กน้อย พบในเลือดและยาลดกรดบางสูตร สัดส่วนคู่กรดเบสใกล้ 1 จะกัน pH ได้ดี";
+      if (s.mode === 1) return "จุดสมดุลของกรดอ่อนกับเบสแก่มี pH มากกว่า 7 เพราะเกลือไฮโดรไลซิสได้เบสอ่อน เลือกฟีนอล์ฟทาลีนได้";
+      return "สารละลายนี้" + kind + " pH " + fmt(pH, 2) + " กรดแก่หมายถึงแตกตัวมาก ไม่ได้แปลว่าเข้มข้นสูงเสมอ";
+    },
+    misconception: function (s) {
+      const sub = acidBy(s.acidId);
+      if (!sub.strong && s.ca > 0.5) return "กรดอ่อนที่เข้มข้นมากอาจมี pH ต่ำกว่ากรดแก่ที่เจือจางมาก ความแรงกับความเข้มข้นเป็นคนละเรื่อง";
+      if (s.mode === 1 && !sub.strong) return "จุดสมดุลไม่จำเป็นต้องเป็น pH 7 เสมอ ขึ้นกับว่าเกลือที่เกิดไฮโดรไลซิสเป็นกรดหรือเบส";
+      return "น้ำบริสุทธิ์เป็นกลางเมื่อ [H₃O⁺] = [OH⁻] ที่อุณหภูมิอื่น Kw เปลี่ยน pH ของจุดกลางจึงไม่ติดที่ 7 เสมอ";
+    }
+  };
+
+  const HALFS = [
+    { id: "Mg", name: "Mg/Mg²⁺", E: -2.37, n: 2, M: 24.305, color: "#d6d3d1" },
+    { id: "Zn", name: "Zn/Zn²⁺", E: -0.76, n: 2, M: 65.38, color: "#a8a29e" },
+    { id: "Fe", name: "Fe/Fe²⁺", E: -0.44, n: 2, M: 55.845, color: "#78716c" },
+    { id: "Pb", name: "Pb/Pb²⁺", E: -0.13, n: 2, M: 207.2, color: "#64748b" },
+    { id: "Cu", name: "Cu/Cu²⁺", E: 0.34, n: 2, M: 63.546, color: "#f59e0b" },
+    { id: "Ag", name: "Ag/Ag⁺", E: 0.80, n: 1, M: 107.868, color: "#e7e5e4" }
+  ];
+  function half(id) { return HALFS.filter(function (h) { return h.id === id; })[0] || HALFS[1]; }
+  function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+  function cellInfo(s) {
+    const A = half(s.left);
+    const B = half(s.right);
+    const cat = A.E >= B.E ? A : B;
+    const an = A.E >= B.E ? B : A;
+    const swapped = an.id !== A.id;
+    const n = A.n * B.n / gcd(A.n, B.n);
+    const E0 = cat.E - an.E;
+    const cAn = an.id === A.id ? s.c1 : s.c2;
+    const cCat = cat.id === A.id ? s.c1 : s.c2;
+    const powAn = n / an.n;
+    const powCat = n / cat.n;
+    const Q = Math.pow(Math.max(cAn, 1e-6), powAn) / Math.pow(Math.max(cCat, 1e-6), powCat);
+    const E = E0 - (8.314 * s.tempK) / (n * 96485) * Math.log(Math.max(Q, 1e-12));
+    const protect = half(s.sac).E < half("Fe").E;
+    return { A: A, B: B, cat: cat, an: an, n: n, E0: E0, E: E, Q: Q, swapped: swapped, protect: protect };
+  }
+  window.ElecLab = {
+    meta: { title: "เคมีไฟฟ้า", en: "Electrochemistry" },
+    modes: ["เซลล์กัลวานิก", "เซลล์อิเล็กโทรลิติก", "สมการเนิร์นสต์", "การกัดกร่อน"],
+    createState: function () {
+      return { mode: 0, playing: true, time: 0, hits: [], left: "Zn", right: "Cu", c1: 1, c2: 1, vext: 2, tempK: 298, sac: "Zn", electrons: true, ions: true, plated: 0, circuit: true };
+    },
+    controls: function (s) {
+      const Lc = L();
+      const opts = HALFS.map(function (h) { return { id: h.id, name: h.name + "  E° " + h.E }; });
+      let html = "";
+      if (s.mode === 3) html += Lc.selectBox("sac", "โลหะที่ต่อกับเหล็ก", s.sac, opts);
+      else {
+        html += Lc.selectBox("left", "ครึ่งเซลล์ซ้าย", s.left, opts);
+        html += Lc.selectBox("right", "ครึ่งเซลล์ขวา", s.right, opts);
+      }
+      html += Lc.slider("c1", "ความเข้มข้นฝั่งซ้าย (mol/L)", 0.001, 2, 0.001, s.c1, 3);
+      html += Lc.slider("c2", "ความเข้มข้นฝั่งขวา (mol/L)", 0.001, 2, 0.001, s.c2, 3);
+      html += Lc.slider("tempK", "อุณหภูมิ (K)", 273, 373, 1, s.tempK, 0);
+      if (s.mode === 1) html += Lc.slider("vext", "แรงดันภายนอก (V)", 0, 12, 0.1, s.vext, 1);
+      html += Lc.toggle("electrons", "แสดงทิศทางอิเล็กตรอน", s.electrons);
+      html += Lc.toggle("ions", "แสดงการเคลื่อนที่ของไอออน", s.ions);
+      return html;
+    },
+    bind: function (root, s) {
+      bindSel(root, s, [["left", "left", false], ["right", "right", false], ["sac", "sac", false]]);
+      bindNum(root, s, [["c1", "c1", 3], ["c2", "c2", 3], ["tempK", "tempK", 0], ["vext", "vext", 1]]);
+      bindTog(root, s, ["electrons", "ions"]);
+    },
+    draw: function (ctx, w, h, s, dt) {
+      bg(ctx, w, h);
+      const info = cellInfo(s);
+      const Txt = L().text;
+      if (s.mode === 3) {
+        L().drawBeaker(ctx, w * 0.3, 40, 160, h * 0.65, 0.7, "rgba(125,211,252,0.25)");
+        ctx.fillStyle = "#78716c";
+        ctx.fillRect(w * 0.4, 70, 16, h * 0.4);
+        ctx.fillStyle = half(s.sac).color;
+        ctx.fillRect(w * 0.52, 80, 16, h * 0.35);
+        Txt(ctx, info.protect ? "เหล็กถูกป้องกัน โลหะที่ต่อให้กร่อนแทน" : "เหล็กเป็นฝ่ายกร่อน เพราะ E° สูงกว่าโลหะที่ต่อ", 20, 32, { color: "#f5e9ff" });
+        return;
+      }
+      L().drawBeaker(ctx, 40, 70, 120, h * 0.6, 0.7, "rgba(192,132,252,0.3)");
+      L().drawBeaker(ctx, w - 170, 70, 120, h * 0.6, 0.7, "rgba(244,114,182,0.25)");
+      ctx.strokeStyle = "#e9d5ff";
+      ctx.beginPath();
+      ctx.moveTo(100, 80);
+      ctx.lineTo(100, 40);
+      ctx.lineTo(w - 110, 40);
+      ctx.lineTo(w - 110, 80);
+      ctx.stroke();
+      ctx.strokeRect(w * 0.4, h * 0.35, w * 0.2, 16);
+      const anIsLeft = info.an.id === half(s.left).id;
+      if (s.electrons && s.playing) {
+        const t = (s.time % 1);
+        const from = anIsLeft ? 110 : w - 120;
+        const to = anIsLeft ? w - 120 : 110;
+        dot(ctx, from + (to - from) * t, 36, 4, "#fef08a");
+      }
+      if (s.ions) {
+        dot(ctx, w * 0.45 + Math.sin(s.time) * 20, h * 0.4, 4, "#93c5fd");
+        dot(ctx, w * 0.55 + Math.cos(s.time) * 16, h * 0.4, 4, "#fda4af");
+      }
+      if (s.mode === 1 && s.playing && s.vext > Math.abs(info.E0)) {
+        const I = (s.vext - Math.abs(info.E0)) / 8;
+        s.plated += I * dt * info.cat.M / (info.n * 96485);
+      }
+      Txt(ctx, "แอโนด " + info.an.id + "  แคโทด " + info.cat.id, 16, 24, { color: "#f5e9ff" });
+      Txt(ctx, (s.mode === 1 ? "อิเล็กโทรลิติก บังคับด้วยแหล่งจ่ายไฟ" : "กัลวานิก เกิดเองเมื่อ E > 0"), 16, h - 16, { color: "#d8b4fe" });
+    },
+    chart: function (ctx, w, h, s) {
+      const info = cellInfo(s);
+      if (s.mode === 1) barsOf(ctx, w, h, [Math.max(0, s.plated * 1000), Math.max(0, (s.vext - Math.abs(info.E0)) / 8)], ["มวลชุบ mg", "กระแสโดยประมาณ"], ["#f0abfc", "#fde68a"]);
+      else if (s.mode === 3) barsOf(ctx, w, h, HALFS.map(function (h) { return h.E + 2.5; }), HALFS.map(function (h) { return h.id; }), ["#c084fc"]);
+      else barsOf(ctx, w, h, [Math.max(0, info.E0 + 1), Math.max(0, info.E + 1)], ["E°+1", "E+1"], ["#c084fc", "#86efac"]);
+    },
+    readout: function (s) {
+      const info = cellInfo(s);
+      return metric(fmt(info.E0, 3), "E° V") + metric(fmt(info.E, 3), "E V") + metric(s.mode === 1 ? fmt(s.plated, 4) : fmt(info.Q, 2), s.mode === 1 ? "มวลชุบ g" : "Q");
+    },
+    equation: function (s) {
+      const info = cellInfo(s);
+      return '<span class="k">เซลล์</span> E° = ' + fmt(info.cat.E, 2) + " − (" + fmt(info.an.E, 2) + ") = " + fmt(info.E0, 3) + " V · เนิร์นสต์ E = " + fmt(info.E, 3) + " V · n = " + info.n;
+    },
+    analysis: function (s) {
+      const info = cellInfo(s);
+      if (s.mode === 3) return info.protect ? "ป้องกันแบบแคโทดิก: โลหะที่ E° ต่ำกว่าเหล็กยอมกร่อนแทน ใช้สังกะสีหุ้มเหล็กได้" : "โลหะนี้มี E° สูงกว่าเหล็ก เหล็กจึงยังเกิดออกซิเดชัน";
+      if (s.mode === 1) return s.vext > Math.abs(info.E0) ? "แรงดันภายนอกมากพอที่จะบังคับปฏิกิริยาย้อนทาง ใช้ชุบโลหะหรือแยกสาร" : "แรงดันยังไม่พอกับค่า E° ของคู่ปฏิกิริยา";
+      return info.E > 0 ? "ปฏิกิริยาเกิดเองได้ อิเล็กตรอนไหลในสายไฟจากแอโนด " + info.an.id + " ไปแคโทด " + info.cat.id + " ไอออนเคลื่อนในสารละลายและสะพานเกลือ" : "E ไม่เป็นบวกในสภาวะนี้ ทิศทางเกิดเองคือสลับขั้ว";
+    },
+    misconception: function (s) {
+      if (s.mode === 1) return "ในเซลล์อิเล็กโทรลิติก แอโนดต่อขั้วบวกของแหล่งจ่ายไฟ แต่ยังคงเป็นที่ที่เกิดออกซิเดชัน แอโนดไม่ได้เป็นขั้วลบเสมอ";
+      if (s.electrons) return "อิเล็กตรอนไหลในสายไฟเท่านั้น ในสารละลายและสะพานเกลือเป็นไอออนที่เคลื่อนที่ ไม่ใช่อิเล็กตรอน";
+      return "ครึ่งเซลล์ที่ E° สูงกว่าเป็นฝ่ายรับอิเล็กตรอนที่แคโทด ไม่ใช่ฝ่ายจ่ายอิเล็กตรอน";
+    }
+  };
+
+  const STEM = ["", "มีเทน", "เอเทน", "โพรเพน", "บิวเทน", "เพนเทน", "เฮกเซน", "เฮปเทน", "ออกเทน", "โนเนน", "เดเคน"];
+  const ENE = ["", "—", "อีทีน", "โพรพีน", "บิวทีน", "เพนทีน", "เฮกซีน", "เฮปทีน", "ออกทีน", "โนนีน", "เดซีน"];
+  const YNE = ["", "—", "เอไทน์", "โพรไพน์", "บิวไทน์", "เพนไทน์", "เฮกไซน์", "เฮปไทน์", "ออกไทน์", "โนไนน์", "เดไซน์"];
+  const OL = ["", "เมทานอล", "เอทานอล", "1-โพรพานอล", "1-บิวทานอล", "1-เพนทานอล", "1-เฮกซานอล", "1-เฮปทานอล", "1-ออกทานอล", "1-โนนานอล", "1-เดคานอล"];
+  function orgInfo(s) {
+    const n = s.carbons;
+    const table = {
+      alkane: { name: STEM[n], mf: "C" + n + "H" + (2 * n + 2), H: 2 * n + 2, bp: -180 + n * 36, polar: false, h: false, kind: "อิ่มตัว เกิดการแทนที่เมื่อมีแสง" },
+      alkene: { name: n < 2 ? "ต้องมี C อย่างน้อย 2" : ENE[n], mf: n < 2 ? "—" : "C" + n + "H" + (2 * n), H: 2 * n, bp: -120 + n * 32, polar: false, h: false, kind: "พันธะคู่ เกิดปฏิกิริยาเติม" },
+      alkyne: { name: n < 2 ? "ต้องมี C อย่างน้อย 2" : YNE[n], mf: n < 2 ? "—" : "C" + n + "H" + (2 * n - 2), H: 2 * n - 2, bp: -90 + n * 30, polar: n === 2, h: false, kind: "พันธะสาม เกิดปฏิกิริยาเติมได้สองครั้ง" },
+      alcohol: { name: OL[n], mf: "C" + n + "H" + (2 * n + 2) + "O", H: 2 * n + 2, bp: 60 + n * 22, polar: true, h: true, kind: "หมู่ OH สร้างพันธะไฮโดรเจน" },
+      ether: { name: "อีเทอร์ C" + n, mf: "C" + n + "H" + (2 * n + 2) + "O", H: 2 * n + 2, bp: -20 + n * 24, polar: true, h: false, kind: "ออกซิเจนคั่นกลาง ไม่มี H บน O" },
+      aldehyde: { name: "แอลดีไฮด์ C" + n, mf: "C" + n + "H" + (2 * n) + "O", H: 2 * n, bp: 20 + n * 22, polar: true, h: false, kind: "หมู่ CHO อยู่ปลายสาย" },
+      ketone: { name: n < 3 ? "คีโตนต้องมี C อย่างน้อย 3" : "คีโตน C" + n, mf: n < 3 ? "—" : "C" + n + "H" + (2 * n) + "O", H: 2 * n, bp: 30 + n * 20, polar: true, h: false, kind: "หมู่คาร์บอนิลอยู่กลางสาย" },
+      acid: { name: "กรดคาร์บอกซิลิก C" + n, mf: "C" + n + "H" + (2 * n) + "O2", H: 2 * n, bp: 110 + n * 18, polar: true, h: true, kind: "หมู่ COOH จุดเดือดสูง" },
+      ester: { name: "เอสเทอร์ C" + n, mf: n < 2 ? "—" : "C" + n + "H" + (2 * n) + "O2", H: 2 * n, bp: 30 + n * 18, polar: true, h: false, kind: "เกิดจากกรดกับแอลกอฮอล์" },
+      amine: { name: "เอมีน C" + n, mf: "C" + n + "H" + (2 * n + 3) + "N", H: 2 * n + 3, bp: 0 + n * 24, polar: true, h: true, kind: "หมู่ NH₂" }
+    };
+    const row = table[s.fg] || table.alkane;
+    const iso = s.fg === "alkane" ? (n < 4 ? 1 : n === 4 ? 2 : n === 5 ? 3 : 5) : s.fg === "alkene" && n >= 4 ? 2 : 1;
+    return Object.assign({ iso: iso, gas: s.tempC > row.bp }, row);
+  }
+  window.OrgLab = {
+    meta: { title: "เคมีอินทรีย์", en: "Organic Chemistry" },
+    modes: ["หมู่ฟังก์ชันและชื่อ", "ไอโซเมอร์และจุดเดือด", "ปฏิกิริยาอินทรีย์", "มอนอเมอร์สู่พอลิเมอร์"],
+    createState: function () {
+      return { mode: 0, playing: true, time: 0, hits: [], carbons: 3, fg: "alcohol", tempC: 25, reagent: "br2", dipole: true, style: "line" };
+    },
+    controls: function (s) {
+      const Lc = L();
+      let html = Lc.slider("carbons", "จำนวนคาร์บอน", 1, 10, 1, s.carbons, 0);
+      html += Lc.selectBox("fg", "หมู่ฟังก์ชัน", s.fg, [
+        { id: "alkane", name: "แอลเคน" }, { id: "alkene", name: "แอลคีน" }, { id: "alkyne", name: "แอลไคน์" },
+        { id: "alcohol", name: "แอลกอฮอล์" }, { id: "ether", name: "อีเทอร์" }, { id: "aldehyde", name: "แอลดีไฮด์" },
+        { id: "ketone", name: "คีโตน" }, { id: "acid", name: "กรดคาร์บอกซิลิก" }, { id: "ester", name: "เอสเทอร์" }, { id: "amine", name: "เอมีน" }
+      ]);
+      html += Lc.slider("tempC", "อุณหภูมิ (°C)", -100, 300, 1, s.tempC, 0);
+      if (s.mode === 2) html += Lc.selectBox("reagent", "รีเอเจนต์", s.reagent, [{ id: "br2", name: "Br₂ ใน CCl₄" }, { id: "kmno4", name: "KMnO₄" }, { id: "h2so4", name: "H₂SO₄ เข้มข้น" }]);
+      html += Lc.toggle("dipole", "แสดงสภาพขั้ว", s.dipole);
+      return html;
+    },
+    bind: function (root, s) {
+      bindNum(root, s, [["carbons", "carbons", 0], ["tempC", "tempC", 0]]);
+      bindSel(root, s, [["fg", "fg", false], ["reagent", "reagent", false]]);
+      bindTog(root, s, ["dipole"]);
+    },
+    draw: function (ctx, w, h, s) {
+      bg(ctx, w, h);
+      const info = orgInfo(s);
+      const n = s.carbons;
+      const gap = Math.min(46, (w - 80) / Math.max(1, n));
+      for (let i = 0; i < n; i++) {
+        const x = 48 + i * gap;
+        const y = h * 0.5 + (i % 2 ? 26 : -26);
+        if (i > 0) {
+          ctx.strokeStyle = "#e9d5ff";
+          ctx.lineWidth = s.fg === "alkyne" ? 3 : s.fg === "alkene" && i === 1 ? 4 : 2;
+          ctx.beginPath();
+          ctx.moveTo(48 + (i - 1) * gap, h * 0.5 + ((i - 1) % 2 ? 26 : -26));
+          ctx.lineTo(x, y);
+          ctx.stroke();
+        }
+        dot(ctx, x, y, 10, "#e9d5ff");
+      }
+      if (s.fg === "alcohol" || s.fg === "acid") dot(ctx, 48 + (n - 1) * gap + 22, h * 0.5 - 20, 8, "#f87171");
+      if (s.fg === "amine") dot(ctx, 48 + (n - 1) * gap + 22, h * 0.5 - 20, 8, "#60a5fa");
+      if (info.gas) {
+        for (let i = 0; i < 6; i++) dot(ctx, w * 0.75 + Math.sin(s.time + i) * 20, 50 + i * 12, 3, "#f5e9ff");
+      }
+      L().text(ctx, info.name + "  " + info.mf, 20, 32, { color: "#f5e9ff", font: "16px Segoe UI, Leelawadee UI" });
+      L().text(ctx, info.gas ? "สูงกว่าจุดเดือด โมเลกุลกระจายเป็นไอ" : "ต่ำกว่าจุดเดือด ยังเป็นของเหลวหรือของแข็ง", 20, h - 18, { color: "#d8b4fe" });
+    },
+    chart: function (ctx, w, h, s) {
+      const bps = [];
+      for (let n = 1; n <= 8; n++) {
+        const fake = orgInfo({ carbons: n, fg: s.fg, tempC: -200 });
+        bps.push(Math.max(0, fake.bp + 100));
+      }
+      barsOf(ctx, w, h, bps, ["1", "2", "3", "4", "5", "6", "7", "8"], ["#c084fc"]);
+    },
+    readout: function (s) {
+      const info = orgInfo(s);
+      return metric(info.mf, "สูตร") + metric(fmt(info.bp, 0), "จุดเดือด °C") + metric(String(info.iso), "ไอโซเมอร์โดยประมาณ");
+    },
+    equation: function (s) {
+      const info = orgInfo(s);
+      const reacts = (s.fg === "alkene" || s.fg === "alkyne") && (s.reagent === "br2" || s.reagent === "kmno4");
+      if (s.mode === 2) return reacts ? '<span class="k">ปฏิกิริยาเติม</span> พันธะคู่หรือพันธะสามทำสี Br₂ หรือ KMnO₄ จางลง' : '<span class="k">ปฏิกิริยา</span> ' + info.kind;
+      if (s.mode === 3 && s.fg === "alkene") return '<span class="k">พอลิเมอร์แบบเติม</span> n ' + info.name + " → พอลิเมอร์สายยาว โดยไม่มีโมเลกุลเล็กหลุดออก";
+      const ihd = info.H ? (s.carbons + 1 - info.H / 2 + (s.fg === "amine" ? 0.5 : 0)) : 0;
+      return '<span class="k">โครงสร้าง</span> ' + info.name + " · " + info.kind + (info.h ? " · มีพันธะไฮโดรเจน" : "") + " · IHD ≈ " + fmt(ihd, 0);
+    },
+    analysis: function (s) {
+      const info = orgInfo(s);
+      return info.name + " จุดเดือดประมาณ " + fmt(info.bp, 0) + " °C " + (info.h ? "สูงเพราะพันธะไฮโดรเจน" : info.polar ? "มีขั้วแต่ไม่สร้างพันธะไฮโดรเจนเอง" : "แรงหลักคือแรงลอนดอน จุดเดือดเพิ่มตามจำนวนคาร์บอน") + " ใช้ในเชื้อเพลิง ตัวทำละลาย และวัตถุดิบพอลิเมอร์";
+    },
+    misconception: function (s) {
+      if (s.mode === 1 && s.carbons >= 4) return "สูตรโมเลกุลเดียวกันอาจมีได้หลายโครงสร้าง จุดเดือดและการละลายจึงไม่เหมือนกัน";
+      if (s.fg === "alkane" && s.reagent === "br2") return "แอลเคนเป็นสารอิ่มตัว จึงไม่ฟอกสีโบรมีนทันทีแบบแอลคีน ต้องใช้แสงเพื่อให้เกิดปฏิกิริยาแทนที่";
+      return "แอลคีนและแอลไคน์เกิดปฏิกิริยาเติมที่พันธะไม่อิ่มตัวได้ง่าย ไม่ได้เกิดการแทนที่แบบแอลเคนเป็นหลัก";
+    }
+  };
+
+  const MONOS = [
+    { id: "pe", name: "เอทิลีน → PE", type: "เติม", unit: 28.054, by: 0, tg: -120, tm: 135, rho: 0.94, ric: "2 หรือ 4" },
+    { id: "pp", name: "โพรพีน → PP", type: "เติม", unit: 42.08, by: 0, tg: -10, tm: 165, rho: 0.90, ric: "5" },
+    { id: "ps", name: "สไตรีน → PS", type: "เติม", unit: 104.15, by: 0, tg: 100, tm: 240, rho: 1.05, ric: "6" },
+    { id: "pvc", name: "ไวนิลคลอไรด์ → PVC", type: "เติม", unit: 62.5, by: 0, tg: 80, tm: 210, rho: 1.38, ric: "3" },
+    { id: "ptfe", name: "เตตราฟลูออโรเอทิลีน → PTFE", type: "เติม", unit: 100.02, by: 0, tg: 127, tm: 327, rho: 2.2, ric: "—" },
+    { id: "pet", name: "กรดเทเรฟทาลิก + เอทิลีนไกลคอล → PET", type: "ควบแน่น", unit: 192.2, by: 18.015, tg: 70, tm: 260, rho: 1.38, ric: "1" },
+    { id: "nylon", name: "กรดอะดิปิก + เฮกซะเมทิลีนไดอะมีน → ไนลอน-6,6", type: "ควบแน่น", unit: 262.35, by: 18.015, tg: 50, tm: 265, rho: 1.14, ric: "—" },
+    { id: "pla", name: "กรดแลกติก → PLA", type: "ควบแน่น", unit: 72.06, by: 18.015, tg: 60, tm: 170, rho: 1.25, ric: "ย่อยสลายได้" }
+  ];
+  const RICS = [
+    { id: "1", name: "PET", melt: true, use: "ขวดน้ำ เส้นใย" },
+    { id: "2", name: "HDPE", melt: true, use: "แกลลอน ขวดนม" },
+    { id: "3", name: "PVC", melt: true, use: "ท่อ สายไฟ" },
+    { id: "4", name: "LDPE", melt: true, use: "ถุงพลาสติก" },
+    { id: "5", name: "PP", melt: true, use: "กล่องอาหาร" },
+    { id: "6", name: "PS", melt: true, use: "โฟม ถ้วย" },
+    { id: "7", name: "อื่นๆ / เทอร์โมเซตบางชนิด", melt: false, use: "ฝาขวดหลายชั้น เบกาไลต์หลอมซ้ำไม่ได้" }
+  ];
+  function polyMass(s) {
+    const m = MONOS[s.mono] || MONOS[0];
+    const n = s.dp;
+    return { m: m, mw: n * m.unit };
+  }
+  window.PolyLab = {
+    meta: { title: "พอลิเมอร์", en: "Polymers" },
+    modes: ["ปฏิกิริยาพอลิเมอไรเซชัน", "โครงสร้างกับสมบัติ", "ยางและวัลคาไนเซชัน", "รหัสรีไซเคิล"],
+    createState: function () {
+      return { mode: 0, playing: true, time: 0, hits: [], mono: 0, dp: 50, tempC: 25, cross: 2, force: 20, struct: "line", ric: "1", showBy: true, chain: true };
+    },
+    controls: function (s) {
+      const Lc = L();
+      let html = Lc.selectBox("mono", "มอนอเมอร์", String(s.mono), MONOS.map(function (m, i) { return { id: String(i), name: m.name }; }));
+      html += Lc.slider("dp", "จำนวนหน่วยซ้ำ n", 5, 200, 5, s.dp, 0);
+      html += Lc.slider("tempC", "อุณหภูมิ (°C)", -50, 350, 5, s.tempC, 0);
+      if (s.mode === 1) html += Lc.selectBox("struct", "โครงสร้าง", s.struct, [{ id: "line", name: "แบบเส้น" }, { id: "branch", name: "แบบกิ่ง" }, { id: "net", name: "แบบร่างแห" }]);
+      if (s.mode === 2) html += Lc.slider("cross", "% พันธะเชื่อมข้ามของกำมะถัน", 0, 20, 0.5, s.cross, 1);
+      if (s.mode === 2 || s.mode === 1) html += Lc.slider("force", "แรงดึง (N)", 0, 100, 5, s.force, 0);
+      if (s.mode === 3) html += Lc.selectBox("ric", "รหัสรีไซเคิล", s.ric, RICS.map(function (r) { return { id: r.id, name: r.id + " " + r.name }; }));
+      html += Lc.toggle("showBy", "แสดงโมเลกุลผลพลอยได้", s.showBy);
+      html += Lc.toggle("chain", "แสดงสายโซ่แทนสูตรลิวอิส", s.chain);
+      return html;
+    },
+    bind: function (root, s) {
+      bindSel(root, s, [["mono", "mono", true], ["struct", "struct", false], ["ric", "ric", false]]);
+      bindNum(root, s, [["dp", "dp", 0], ["tempC", "tempC", 0], ["cross", "cross", 1], ["force", "force", 0]]);
+      bindTog(root, s, ["showBy", "chain"]);
+    },
+    draw: function (ctx, w, h, s) {
+      bg(ctx, w, h);
+      const info = polyMass(s);
+      const melted = s.struct !== "net" && s.tempC > info.m.tm && s.mode !== 3;
+      const stiff = (s.struct === "net" ? 4 : s.struct === "line" ? 1.4 : 1) * (1 + s.cross * 0.08);
+      const stretch = melted ? 0.2 : Math.min(1.6, s.force / (30 * stiff));
+      const y0 = h * 0.55;
+      ctx.strokeStyle = melted ? "#fde68a" : "#e9d5ff";
+      ctx.lineWidth = 2;
+      const links = s.struct === "net" ? 4 : 3;
+      for (let row = 0; row < links; row++) {
+        ctx.beginPath();
+        for (let i = 0; i < 28; i++) {
+          const x = 30 + i * ((w - 60) / 27) * (1 + stretch * 0.15);
+          const y = y0 + (row - 1) * 28 + Math.sin(i * 0.7 + s.time + row) * (s.struct === "branch" ? 10 : 6);
+          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      if (s.struct === "net" || (s.mode === 2 && s.cross > 0)) {
+        ctx.strokeStyle = "#fbbf24";
+        for (let i = 0; i < Math.max(1, Math.round(s.cross)); i++) {
+          const x = 50 + i * 24;
+          ctx.beginPath();
+          ctx.moveTo(x, y0 - 28);
+          ctx.lineTo(x, y0 + 28);
+          ctx.stroke();
+        }
+      }
+      if (s.showBy && info.m.type === "ควบแน่น") {
+        for (let i = 0; i < 4; i++) dot(ctx, w * 0.2 + i * 28, 48 + Math.sin(s.time * 2 + i) * 6, 4, "#7dd3fc");
+      }
+      L().text(ctx, info.m.name, 16, 28, { color: "#f5e9ff" });
+      L().text(ctx, melted ? "อุณหภูมิเกินจุดหลอม สายแบบเส้นหรือกิ่งเลื่อนหลุดจากกัน" : "สายยังยึดกันอยู่", 16, h - 16, { color: "#d8b4fe" });
+    },
+    chart: function (ctx, w, h, s) {
+      const info = polyMass(s);
+      const stiff = (s.struct === "net" ? 80 : s.struct === "line" ? 40 : 25) * (1 + s.cross * 0.05);
+      const strain = [10, 25, 40, 60, 80].map(function (F) { return Math.min(100, F / stiff * 40); });
+      barsOf(ctx, w, h, strain, ["10N", "25N", "40N", "60N", "80N"], ["#c084fc"]);
+    },
+    readout: function (s) {
+      const info = polyMass(s);
+      const ric = RICS.filter(function (r) { return r.id === s.ric; })[0] || RICS[0];
+      if (s.mode === 3) return metric(ric.id, "รหัส") + metric(ric.melt ? "หลอมซ้ำได้" : "หลอมซ้ำไม่ได้", "ความร้อน") + metric(fmt(info.mw, 0), "Mw ตัวอย่าง");
+      return metric(fmt(info.mw, 0), "Mw เฉลี่ย") + metric(String(s.dp), "n") + metric(fmt(info.m.tm, 0), "Tm °C");
+    },
+    equation: function (s) {
+      const info = polyMass(s);
+      if (info.m.type === "ควบแน่น") return '<span class="k">ควบแน่น</span> หน่วยซ้ำ ' + fmt(info.m.unit, 2) + " g/mol หลังผลพลอยได้หลุดออกแล้ว · Mw ≈ n × หน่วยซ้ำ = " + fmt(info.mw, 0) + " g/mol";
+      return '<span class="k">แบบเติม</span> Mw ≈ n × มวลมอนอเมอร์ = ' + fmt(s.dp, 0) + " × " + fmt(info.m.unit, 2) + " = " + fmt(info.mw, 0) + " g/mol";
+    },
+    analysis: function (s) {
+      const info = polyMass(s);
+      if (s.mode === 3) {
+        const ric = RICS.filter(function (r) { return r.id === s.ric; })[0];
+        return "รหัส " + ric.id + " " + ric.name + " ใช้ทำ" + ric.use + (ric.melt ? " เป็นเทอร์โมพลาสติกหลอมซ้ำได้" : " บางชนิดเป็นเทอร์โมเซตหรือผสมหลายชั้น รีไซเคิลยาก");
+      }
+      if (s.mode === 2) return "ยางธรรมชาติยืดแล้วคืนรูปได้ไม่ดี เติมกำมะถันสร้างสะพานเชื่อมข้ามจึงทนและเด้งกลับ ถ้าเชื่อมข้ามมากเกินจะแข็งเปราะ";
+      return info.m.type + " ความหนาแน่นโดยประมาณ " + info.m.rho + " g/cm³ Tg " + info.m.tg + " °C โครงสร้างร่างแหไม่หลอมเหลวแต่สลายตัวเมื่อร้อนจัด";
+    },
+    misconception: function (s) {
+      const info = polyMass(s);
+      if (s.mode === 0 && info.m.type === "ควบแน่น" && s.showBy) return "ผลพลอยได้ของพอลิเมอร์ควบแน่นไม่จำเป็นต้องเป็นน้ำเสมอ อาจเป็น HCl หรือแอลกอฮอล์ก็ได้ แล้วแต่คู่ฟังก์ชัน";
+      if (s.struct === "net" || (s.mode === 3 && s.ric === "7")) return "พลาสติกทุกชนิดหลอมซ้ำไม่ได้ เทอร์โมเซตโครงร่างแหจะแตกสลายแทนการหลอม";
+      return "สายพอลิเมอร์ในตัวอย่างเดียวกันยาวไม่เท่ากันหมด มวลโมเลกุลที่รายงานจึงเป็นค่าเฉลี่ย";
+    }
+  };
+})();
+
 /* คลังโจทย์และกระบวนการฝึก 5 ขั้น */
 (function () {
   const PAGE = 8;
@@ -4542,7 +5836,15 @@ input[type="range"] { width: 100%; accent-color: #c084fc; }
     atom: window.AtomLab,
     bond: window.BondLab,
     mole: window.MoleLab,
-    solution: window.SolutionLab
+    solution: window.SolutionLab,
+    stoich: window.StoichLab,
+    gas: window.GasLab,
+    rate: window.RateLab,
+    equil: window.EqLab,
+    acid: window.AcidLab,
+    electro: window.ElecLab,
+    organic: window.OrgLab,
+    polymer: window.PolyLab
   };
   let cleanup = null;
 
@@ -4565,13 +5867,13 @@ input[type="range"] { width: 100%; accent-color: #c084fc; }
     const st = window.CHEM.stats();
     return '<section class="hero"><div class="hero-copy"><div class="badge"><span class="dot"></span> เรียนเคมีแบบโต้ตอบ</div>' +
       '<h1><span class="a">Chemistry</span><br><span class="b">Learning</span></h1>' +
-      '<p class="lead">ฝึกโจทย์เอง หรือเข้าห้องแล็บจำลอง 5 บท</p>' +
+      '<p class="lead">ฝึกโจทย์เอง หรือเข้าห้องแล็บจำลอง ' + window.CHEM.LABS.length + ' บท</p>' +
       '<div class="cta"><a class="btn btn-primary" href="#start">เริ่มเรียนรู้</a><a class="btn btn-dark" href="#custom">ฝึกทำโจทย์</a></div></div>' +
       '<div class="planet-wrap"><canvas id="hero-canvas" aria-hidden="true"></canvas></div></section>' +
       '<section class="journey"><h2>เลือกทางที่ต้องการ</h2>' +
       '<div class="jgrid"><a class="jcard" href="#custom"><div class="ico">✎</div><h3>ฝึกทำโจทย์</h3><p>พิมพ์โจทย์เอง เลือกสูตร แล้วให้ระบบคำนวณ</p><span>เริ่มฝึก →</span></a>' +
       '<a class="jcard" href="#bank"><div class="ico">☰</div><h3>คลังโจทย์</h3><p>โจทย์พร้อมตรวจคำตอบ ' + window.Practice.count() + ' ข้อ</p><span>เปิดคลัง →</span></a>' +
-      '<a class="jcard" href="#lab"><div class="ico">⚗</div><h3>ห้องแล็บ</h3><p>แบบจำลอง 5 บท ปรับค่าแล้วดูผลทันที</p><span>เข้าแล็บ →</span></a>' +
+      '<a class="jcard" href="#lab"><div class="ico">⚗</div><h3>ห้องแล็บ</h3><p>แบบจำลอง ' + window.CHEM.LABS.length + ' บท ปรับค่าแล้วดูผลทันที</p><span>เข้าแล็บ →</span></a>' +
       '<a class="jcard" href="#progress"><div class="ico">▤</div><h3>ความก้าวหน้า</h3><p>ทำแล้ว ' + st.solved + ' ข้อ</p><span>ดูสถิติ →</span></a></div></section>';
   }
 
